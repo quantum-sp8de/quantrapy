@@ -1,4 +1,4 @@
-# eospy library
+# quantrapy library
 
 This library is still a work in progress but currently has the ability to perform all `cleos get` functions without compiling the code.
 
@@ -39,15 +39,15 @@ This library is very much a work in progress.
 
 ```
 # create virtual environment
-mkdir -p ~/envs/eospy
-virtualenv ~/envs/eospy
+mkdir -p ~/envs/quantrapy
+virtualenv ~/envs/quantrapy
 # activate the environment
-source ~/envs/eospy/bin/activate
+source ~/envs/quantrapy/bin/activate
 # install from github
-# look [here](https://github.com/eosnewyork/eospy/releases) for the latest release.
-pip install git+https://github.com/eosnewyork/eospy.git@<release>
+# look [here](https://github.com/eosnewyork/quantrapy/releases) for the latest release.
+pip install git+https://github.com/eosnewyork/quantrapy.git@<release>
 # install the library from pip
-pip install libeospy
+pip install libquantrapy
 ```
 
 ### Windows
@@ -61,14 +61,14 @@ pip install libeospy
 2. Install git
    https://www.atlassian.com/git/tutorials/install-git
 
-3. Install eospy. Look [here](https://github.com/eosnewyork/eospy/releases) for the latest release number.
+3. Install quantrapy. Look [here](https://github.com/eosnewyork/quantrapy/releases) for the latest release number.
 
 ```
 # install from github
-# pip install git+https://github.com/eosnewyork/eospy.git@<release>
-pip install git+https://github.com/eosnewyork/eospy.git@v1.1.8
+# pip install git+https://github.com/eosnewyork/quantrapy.git@<release>
+pip install git+https://github.com/eosnewyork/quantrapy.git@v1.1.8
 # install from pip
-pip install libeospy
+pip install libquantrapy
 ```
 
 ## API Endpoints
@@ -81,42 +81,38 @@ https://www.eosdocs.io/resources/apiendpoints/
 
 ```
 # Get chain information
-pycleos --url https://api.eosnewyork.io get info
+pyquantra --url https://api.eosnewyork.io get info
 
 # get information about a block
-pycleos --url https://api.eosnewyork.io get block 447
+pyquantra --url https://api.eosnewyork.io get block 447
 
 # Retrieve an account from the blockchain
-pycleos --url https://api.eosnewyork.io get account --account eosio
+pyquantra --url https://api.eosnewyork.io get account --account eosio
 
 # Retrieve the code and ABI for an account
-pycleos --url https://api.eosnewyork.io get code --account eosio
+pyquantra --url https://api.eosnewyork.io get code --account eosio
 
 # Retrieve the ABI for an account
-pycleos --url https://api.eosnewyork.io get abi --account eosio
+pyquantra --url https://api.eosnewyork.io get abi --account eosio
 
 # Retrieve the contents of a database table
-pycleos --url https://api.eosnewyork.io get table --code eosio --scope eosio --table producers
+pyquantra --url https://api.eosnewyork.io get table --code eosio --scope eosio --table producers
 
 # Retrive currency information
-pycleos --url https://api.eosnewyork.io get currency balance --code eosio.token --symbol EOS --account aaaaaaaaaaaa
-pycleos --url https://api.eosnewyork.io get currency stats --code eosio.token --symbol EOS
+pyquantra --url https://api.eosnewyork.io get currency balance --code eosio.token --symbol EOS --account aaaaaaaaaaaa
+pyquantra --url https://api.eosnewyork.io get currency stats --code eosio.token --symbol EOS
 
 # get accounts associated with public key
-pycleos --url https://api.eosnewyork.io get accounts --key EOS52gpRqAPfggYHLXbMuC4TSQd8WWWo94KrMq4umgUcjM62Y2dWF
+pyquantra --url https://api.eosnewyork.io get accounts --key EOS52gpRqAPfggYHLXbMuC4TSQd8WWWo94KrMq4umgUcjM62Y2dWF
 
 # get transaction information
-pycleos --url https://api.eosnewyork.io get transaction --transaction 42dacd5722001b734be46a2140917e06cd21d42425f927f506c07b4388b07f62
+pyquantra --url https://api.eosnewyork.io get transaction --transaction 42dacd5722001b734be46a2140917e06cd21d42425f927f506c07b4388b07f62
 
 # get account actions
-pycleos --url https://api.eosnewyork.io get actions --account aaaaaaaaaaaa
+pyquantra --url https://api.eosnewyork.io get actions --account aaaaaaaaaaaa
 
 ```
 
 ## Examples
 
 Check out the examples directory for some examples of how to use the library
-
-## Testeos
-
-Coming soon...
