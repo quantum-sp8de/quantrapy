@@ -159,6 +159,12 @@ def cleos():
     set_contract_parser.add_argument('key', type=str, action='store', help='Key to sign the transaction')
     set_contract_parser.add_argument('--permission', '-p', type=str, action='store', default='active', dest='permission')
     set_contract_parser.add_argument('--dont-broadcast', '-d', action='store_false', default=True, dest='broadcast')
+    # random commands
+    # getconfig
+    random_parser = subparsers.add_parser('random')
+    random_subparsers = random_parser.add_subparsers(dest='random', help='Send (q)random action to the blockchain')
+    getconfig_random = random_subparsers.add_parser('getconfig')
+    getconfig_random.add_argument('account', type=str, action='store', help='account name with config for (q)random')
 
     # process args
     args = parser.parse_args()
@@ -273,7 +279,9 @@ def cleos():
         elif args.system == 'listproducers':
             resp = ce.get_producers(lower_bound=args.lower_bound, limit=args.limit)
             console_print(resp)
-
+    elif args.subparser == 'random':
+        if args.random == 'getconfig':
+            console_print(ce.get_table(code=args.account, scope=args.account, table='config'))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
