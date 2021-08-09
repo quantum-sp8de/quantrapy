@@ -159,6 +159,7 @@ def cleos():
     set_contract_parser.add_argument('key', type=str, action='store', help='Key to sign the transaction')
     set_contract_parser.add_argument('--permission', '-p', type=str, action='store', default='active', dest='permission')
     set_contract_parser.add_argument('--dont-broadcast', '-d', action='store_false', default=True, dest='broadcast')
+
     # process args
     args = parser.parse_args()
     #
