@@ -212,14 +212,14 @@ class Cleos:
         #      keys = parse_key_file(keys, first_key=False)
         if not isinstance(keys, list):
             if not isinstance(keys, Signer):
-                raise EOSKeyError('Must pass a class that extends the eospy.Signer class')
+                raise EOSKeyError('Must pass a class that extends the quantralib.Signer class')
             keys = [keys]
 
         for key in keys:
             # if check_wif(key) :
             #     k = EOSKey(key)
             if not isinstance(key, Signer):
-                raise EOSKeyError('Must pass a class that extends the eospy.Signer class')
+                raise EOSKeyError('Must pass a class that extends the quantralib.Signer class')
             signatures.append(key.sign(digest))
         # build final trx
         final_trx = {

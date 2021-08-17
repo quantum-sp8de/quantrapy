@@ -652,7 +652,7 @@ class PackedTransaction:
         ''' '''
         (length, ctx_buf) = self._decode_buffer(VarUInt(), buf)
         if length > 0:
-            raise NotImplementedError("Currently eospy does not support context_free_actions")
+            raise NotImplementedError("Currently quantralib does not support context_free_actions")
         # get length of action array
         return (length, ctx_buf)
 
@@ -662,7 +662,7 @@ class PackedTransaction:
         trx_ext = []
         (length, ctx_buf) = self._decode_buffer(VarUInt(), buf)
         if length > 0:
-            raise NotImplementedError("Currently eospy does not support transaction extensions")
+            raise NotImplementedError("Currently quantralib does not support transaction extensions")
         # get length of action array
         return (trx_ext, ctx_buf)
 

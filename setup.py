@@ -8,19 +8,20 @@ with open(os.path.join(this_directory, 'README.md')) as f:
     long_description = f.read()
 
 about = {}
-with open(os.path.join(here, 'eospy', '__version__.py'), 'r') as f:
+with open(os.path.join(here, 'quantralib', '__version__.py'), 'r') as f:
     exec(f.read(), about)
 
 setup(
-    name='libeospy',
+    name='quantralib',
     version=os.getenv('BUILD_VERSION', about['__version__']),
-    description='Python library for the eos.io REST API',
+    description='Python library for the eos.io REST API and QRandom ecosystem',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='deck',
-    author_email='deck@eosnewyork.io',
-    url='https://github.com/eosnewyork/eospy',
-    packages=find_packages(),
+    author='plageat',
+    author_email='plageat90@gmail.com',
+    url='https://github.com/AlexandrDedckov/quantrapy',
+#    packages=find_packages(),
+    packages=["quantralib"],
     test_suite='nose.collector',
     install_requires=[
         'requests',
@@ -33,8 +34,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'validate_chain = eospy.command_line:validate_chain',
-            'pycleos = eospy.command_line:cleos',
-            'pytesteos = eospy.command_line:testeos',
+            'validate_chain = quantralib.command_line:validate_chain',
+            'quantrapy = quantralib.command_line:cleos',
+            'pytesteos = quantralib.command_line:testeos',
         ],
     })

@@ -1,8 +1,8 @@
 import sys
 
-sys.path.append('../eospy')
+sys.path.append('../quantralib')
 
-from eospy.cleos import EOSKey
+from quantralib.cleos import EOSKey
 import hashlib
 
 

@@ -1,6 +1,6 @@
 from nose.tools import raises
 import requests
-import eospy.cleos
+import quantralib.cleos
 import sys
 sys.path.append('../eospy')
 
@@ -8,7 +8,7 @@ sys.path.append('../eospy')
 class TestCleos:
 
     def setup(self):
-        self.ce = eospy.cleos.Cleos('https://api.pennstation.eosnewyork.io:7101')
+        self.ce = quantralib.cleos.Cleos('https://api.pennstation.eosnewyork.io:7101')
         self.json_to_bin = {u'to': u'eosio', u'memo': u'test', u'from': u'eosio', u'quantity': u'1.0000 EOS'}
         self.bin_to_json = '0000000000ea30550000000000ea3055102700000000000004454f53000000000474657374'
 
