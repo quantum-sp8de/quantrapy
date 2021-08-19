@@ -44,18 +44,32 @@ class EOSRandom:
     def get_random_price(self):
         return self.get_config_table_value("random_price")
 
+    def _try_with_key(self, account, en_value, key_type):
+        if key_type == 'dynamic':
+            key = self.get_dynamic_encrypt_pubkey(account)
+        elif key_type == 'backup':
+            key = self.get_dynamic_backup_pubkey(account)
+        else:
+            raise RuntimeError("Invilid key type, must be 'dynamic' or 'backup'")
+
+        value = xor_crypt_decode(en_value, key)
+        return int(value)
+
     def get_randresult(self, account):
         r = self.ce.get_table(self.contract_account, account, "randresult2")
         owner = r['rows'][0]["owner"]
         en_value = r['rows'][0]["value"].strip()
-        key = self.get_dynamic_encrypt_pubkey(account)
 
-        value = xor_crypt_decode(en_value, key)
-        # if key has been changed meantime
-        try:
-            ret = int(value)
-        except Exception:
-            raise RuntimeError("Invalid value and key pair: %s/%s..." % (en_value, key[:7])) from None
+        ret = None
+        for key_type in ("dynamic", "backup"):
+            try:
+                ret = self._try_with_key(account, en_value, key_type)
+                break
+            except Exception:
+                continue
+
+        if not ret:
+            raise RuntimeError("Invalid value: %s can not be restored with both dynamic/backup keys" % en_value) from None
 
         return ret
 
@@ -121,7 +135,7 @@ class EOSRandom:
 
         return self._push_action_with_data(arguments, payload)
 
-    def set_dynamic_encrypt_pubkey(self, account, pubkey):
+    def _set_dynamic_pubkey(self, account, pubkey, key_type):
         authority = {
             "threshold": "1",
             "accounts": [],
@@ -131,16 +145,28 @@ class EOSRandom:
             }],
             "waits": []
         }
-        return self._set_account_permission(account, 'encrypt', authority)
+        return self._set_account_permission(account, key_type, authority)
 
-    def get_dynamic_encrypt_pubkey(self, account):
+    def set_dynamic_encrypt_pubkey(self, account, pubkey):
+        return self._set_dynamic_pubkey(account, pubkey, 'encrypt')
+
+    def set_dynamic_backup_pubkey(self, account, pubkey):
+        return self._set_dynamic_pubkey(account, pubkey, 'backup')
+
+    def _get_dynamic_pubkey(self, account, key_type):
         key = None
         acc_info = self.ce.get_account(account)
         for perm in acc_info['permissions']:
-            if 'encrypt' == perm['perm_name']:
+            if key_type == perm['perm_name']:
                 key = perm["required_auth"]["keys"][-1]["key"]
 
         return key
+
+    def get_dynamic_encrypt_pubkey(self, account):
+        return self._get_dynamic_pubkey(account, 'encrypt')
+
+    def get_dynamic_backup_pubkey(self, account):
+        return self._get_dynamic_pubkey(account, 'backup')
 
     def buy_random_value(self, account, min_depos, memo=""):
         arguments = {
