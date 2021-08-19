@@ -20,7 +20,6 @@ setup(
     author='plageat',
     author_email='plageat90@gmail.com',
     url='https://github.com/AlexandrDedckov/quantrapy',
-#    packages=find_packages(),
     packages=["quantralib"],
     test_suite='nose.collector',
     install_requires=[
