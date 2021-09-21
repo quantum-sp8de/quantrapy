@@ -166,6 +166,9 @@ def cleos():
     random_subparsers = random_parser.add_subparsers(dest='random', help='Send (q)random action to the blockchain')
     # getconfig
     getconfig_random = random_subparsers.add_parser('getconfig')
+    # getrandom
+    getrandom_random = random_subparsers.add_parser('getrandom')
+    getrandom_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
     # buyrandom
     buy_random = random_subparsers.add_parser('buyrandom')
     buy_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
@@ -298,6 +301,8 @@ def cleos():
                           chain_url=args.url)
         if args.random == 'getconfig':
             console_print(chain.get_config_table())
+        if args.random == 'getrandom':
+            console_print(chain.get_randresult(account=args.account))
         if args.random == 'buyrandom':
             console_print(chain.buy_random(account=args.account))
 
