@@ -162,7 +162,6 @@ def cleos():
     # random commands
     random_parser = subparsers.add_parser('random')
     random_parser.add_argument('--contract_account', '-c', type=str, action='store', help='account with QRandom contract', required=True)
-    random_parser.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
     random_parser.add_argument('--tokens_account', '-t', type=str, action='store', help='account with tokens to operate within QRandom contract', required=True)
     random_subparsers = random_parser.add_subparsers(dest='random', help='Send (q)random action to the blockchain')
     # getconfig
@@ -170,6 +169,7 @@ def cleos():
     # buyrandom
     buy_random = random_subparsers.add_parser('buyrandom')
     buy_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
+    buy_random.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
     # process args
     args = parser.parse_args()
@@ -285,8 +285,13 @@ def cleos():
             resp = ce.get_producers(lower_bound=args.lower_bound, limit=args.limit)
             console_print(resp)
     elif args.subparser == 'random':
-        priv_key = parse_key_file(args.key_file)
         from .erandom import EOSRandom
+        if args.random == 'buyrandom':
+            priv_key = parse_key_file(args.key_file)
+        else:
+            from .cipher import generate_dynamic_key
+            priv_key = generate_dynamic_key()
+
         chain = EOSRandom(args.contract_account,
                           p_key=priv_key,
                           tokens_account=args.tokens_account,
