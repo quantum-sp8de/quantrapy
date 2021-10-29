@@ -34,6 +34,12 @@ class EOSRandom:
         """Get main configuration for QRandom"""
         return self.ce.get_table(self.contract_account, self.contract_account, "config")
 
+    def get_config_keystable(self):
+        return self.ce.get_table(self.contract_account, self.contract_account, "keysconfig")
+
+    def get_rkeys(self, account):
+        return self.ce.get_table(self.contract_account, account, "keys")
+
     def get_config_table_value(self, value):
         r = self.get_config_table()
         ret = r['rows'][0][value]
@@ -107,15 +113,33 @@ class EOSRandom:
 
         return self._push_action_with_data(arguments, payload)
 
-    def setrandom(self, random_num, account):
+    def setrandom(self, random_num, account, pin):
         """Set the new value in QRandom subsystem"""
         arguments = {
             "owner": account,
             "value": str(random_num),
+            "password": pin,
         }
         payload = {
             "account": self.contract_account,
             "name": "setrandom",
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def setuserkey(self, account, generator, key):
+        """Set the new key for random values for a specific generator"""
+        arguments = {
+            "generator": generator,
+            "key": key,
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": "setuserkey",
             "authorization": [{
                 "actor": account,
                 "permission": "active",
