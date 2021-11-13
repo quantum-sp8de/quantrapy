@@ -74,7 +74,7 @@ class EOSRandom:
         ret = None
         for key_type in ("dynamic", "backup"):
             try:
-                ret = self._try_with_key(account, en_value, key_type)
+                ret = self._try_with_key(owner, en_value, key_type)
                 break
             except Exception:
                 continue
