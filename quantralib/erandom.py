@@ -3,8 +3,8 @@ from .keys import EOSKey
 from .cipher import xor_crypt_decode
 
 
-class EOSRandom:
-    def __init__(self, contract_account, p_key, tokens_account, chain_url="http://localhost", chain_port=None):
+class EOSSP8DEBase:
+    def __init__(self, contract_account, p_key, chain_url="http://localhost", chain_port=None):
         self.chain_url = chain_url
         self.chain_port = chain_port
         if chain_port:
@@ -14,6 +14,38 @@ class EOSRandom:
         self.ce = Cleos(url)
         self.contract_account = contract_account
         self.p_key = p_key
+
+    def _push_action_with_data(self, arguments, payload):
+        data = self.ce.abi_json_to_bin(payload['account'], payload['name'], arguments)
+        payload['data'] = data['binargs']
+        trx = {"actions": [payload]}
+
+        key = EOSKey(self.p_key)
+        resp = self.ce.push_transaction(trx, key, broadcast=True)
+
+        return resp
+
+    def _set_account_permission(self, account, permission, authority, parent="active" ):
+        arguments = {
+            "account": account,
+            "permission": permission,
+            "parent": parent,
+            "auth": authority
+        }
+        payload = {
+            "account": "eosio",
+            "name": "updateauth",
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+class EOSRandom(EOSSP8DEBase):
+    def __init__(self, contract_account, p_key, tokens_account, chain_url="http://localhost", chain_port=None):
+        EOSSP8DEBase.__init__(self, contract_account, p_key, chain_url=chain_url, chain_port=chain_port)
         self.tokens_account = tokens_account
 
     def check_if_validator(self, account):
@@ -84,16 +116,6 @@ class EOSRandom:
 
         return ret
 
-    def _push_action_with_data(self, arguments, payload):
-        data = self.ce.abi_json_to_bin(payload['account'], payload['name'], arguments)
-        payload['data'] = data['binargs']
-        trx = {"actions": [payload]}
-
-        key = EOSKey(self.p_key)
-        resp = self.ce.push_transaction(trx, key, broadcast=True)
-
-        return resp
-
     def register_as_validator(self, account, depos):
         """Register account to be able generate and send randoms"""
         arguments = {
@@ -148,23 +170,6 @@ class EOSRandom:
 
         return self._push_action_with_data(arguments, payload)
 
-    def _set_account_permission(self, account, permission, authority, parent="active" ):
-        arguments = {
-            "account": account,
-            "permission": permission,
-            "parent": parent,
-            "auth": authority
-        }
-        payload = {
-            "account": "eosio",
-            "name": "updateauth",
-            "authorization": [{
-                "actor": account,
-                "permission": "active",
-            }],
-        }
-
-        return self._push_action_with_data(arguments, payload)
 
     def _set_dynamic_pubkey(self, account, pubkey, key_type):
         authority = {
@@ -223,3 +228,26 @@ class EOSRandom:
         rand_price = self.get_random_price()
         self.buy_random_value(account, rand_price, memo)
         return self.get_randresult(account)
+
+class EOSSP8DE_NFT(EOSSP8DEBase):
+    def __init__(self, contract_account, p_key, chain_url="http://localhost", chain_port=None):
+        EOSSP8DEBase.__init__(self, contract_account, p_key, chain_url=chain_url, chain_port=chain_port)
+
+    def authorreg(self, account, author, dappinfo, fieldtypes, priorityimg):
+        """"""
+        arguments = {
+            "author": author,
+            "dappinfo": dappinfo,
+            "fieldtypes": fieldtypes,
+            "priorityimg": priorityimg
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": "authorreg",
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)

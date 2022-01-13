@@ -41,5 +41,5 @@ class DynamicUrl:
         try:
             r.raise_for_status()
         except:
-            raise requests.exceptions.HTTPError('Error: {}'.format(r.json()))
+            raise requests.exceptions.HTTPError('Error: {}'.format(r.json()), response=r)
         return r.json()
