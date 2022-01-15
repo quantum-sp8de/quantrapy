@@ -43,7 +43,6 @@ class TestNFT(unittest.TestCase):
         self.assertEqual(resp['code'], 500)
         self.assertIn('already registered', resp['error']['details'][0]['message'])
 
-
     def test_authorreg_invalid_user(self):
         with self.assertRaises(requests.exceptions.HTTPError) as cm:
             r = TestNFT.q.authorreg(NFT_ACCOUNT,
@@ -51,6 +50,27 @@ class TestNFT(unittest.TestCase):
                                     "{'info': 'app info'}",
                                     fieldtypes="type",
                                     priorityimg="http://unknown.irh/a/b/c/image.png")
+
+        resp = cm.exception.response.json()
+        self.assertEqual(resp['code'], 500)
+        self.assertIn('Name contains invalid character', resp['error']['details'][0]['message'])
+
+    def test_authorupdate_user(self):
+        r = TestNFT.q.authorupdate(NFT_ACCOUNT,
+                                   NFT_ACCOUNT,
+                                   "{'info': 'updated app info'}",
+                                   fieldtypes="updated type",
+                                   priorityimg="http://unknown.irh/a/b/c/updated_image.png")
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+    def test_authorupdate_invalid_user(self):
+        with self.assertRaises(requests.exceptions.HTTPError) as cm:
+            r = TestNFT.q.authorupdate(NFT_ACCOUNT,
+                                       TestNFT.invalid_author,
+                                       "{'info': 'updated app info'}",
+                                       fieldtypes="updated type",
+                                       priorityimg="http://unknown.irh/a/b/c/updated_image.png")
 
         resp = cm.exception.response.json()
         self.assertEqual(resp['code'], 500)
