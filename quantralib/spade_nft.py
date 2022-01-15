@@ -1,5 +1,19 @@
+import string
 from .spade_base import EOSSP8DEBase
 
+
+_alphabet = string.ascii_lowercase + string.digits[1:6]
+
+def _validate_s(s):
+    invalid = []
+    for i,sym in enumerate(s):
+        if sym not in _alphabet:
+            invalid.append("{} at index {}".format(sym, i))
+    if invalid:
+        er_desc = ";".join(invalid)
+        raise ValueError("Invalid symbols found in name {}: {}".format(s, er_desc))
+
+    return s
 
 class EOSSP8DE_NFT(EOSSP8DEBase):
     def __init__(self, contract_account, p_key, chain_url="http://localhost", chain_port=None):
@@ -7,7 +21,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
 
     def _author(self, account, author, dappinfo, fieldtypes, priorityimg, op_type):
         arguments = {
-            "author": author,
+            "author": _validate_s(author),
             "dappinfo": dappinfo,
             "fieldtypes": fieldtypes,
             "priorityimg": priorityimg
