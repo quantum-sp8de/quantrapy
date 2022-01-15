@@ -8,7 +8,7 @@ import requests
 import json
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)),'..'))
-from quantralib.erandom import EOSSP8DE_NFT
+from quantralib.spade_nft import EOSSP8DE_NFT
 
 # ===
 # Adjust to your values
