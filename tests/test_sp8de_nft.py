@@ -22,7 +22,8 @@ class TestNFT(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        cls.q = EOSSP8DE_NFT(contract_account=NFT_CONTRACT,
+        cls.q = EOSSP8DE_NFT(account=NFT_ACCOUNT,
+                             contract_account=NFT_CONTRACT,
                              p_key=NFT_PKEY,
                              chain_url=NFT_CHAIN,
                              chain_port=None)
@@ -34,7 +35,6 @@ class TestNFT(unittest.TestCase):
     def test_authorreg_existing_user(self):
         with self.assertRaises(requests.exceptions.HTTPError) as cm:
             r = TestNFT.q.authorreg(NFT_ACCOUNT,
-                                    NFT_ACCOUNT,
                                     "{'info': 'app info'}",
                                     fieldtypes="type",
                                     priorityimg="http://unknown.irh/a/b/c/image.png")
@@ -45,15 +45,13 @@ class TestNFT(unittest.TestCase):
 
     def test_authorreg_invalid_user(self):
         with self.assertRaises(ValueError) as cm:
-            r = TestNFT.q.authorreg(NFT_ACCOUNT,
-                                    TestNFT.invalid_author,
+            r = TestNFT.q.authorreg(TestNFT.invalid_author,
                                     "{'info': 'app info'}",
                                     fieldtypes="type",
                                     priorityimg="http://unknown.irh/a/b/c/image.png")
 
     def test_authorupdate_user(self):
         r = TestNFT.q.authorupdate(NFT_ACCOUNT,
-                                   NFT_ACCOUNT,
                                    "{'info': 'updated app info'}",
                                    fieldtypes="updated type",
                                    priorityimg="http://unknown.irh/a/b/c/updated_image.png")
@@ -62,8 +60,7 @@ class TestNFT(unittest.TestCase):
 
     def test_authorupdate_invalid_user(self):
         with self.assertRaises(ValueError) as cm:
-            r = TestNFT.q.authorupdate(NFT_ACCOUNT,
-                                       TestNFT.invalid_author,
+            r = TestNFT.q.authorupdate(TestNFT.invalid_author,
                                        "{'info': 'updated app info'}",
                                        fieldtypes="updated type",
                                        priorityimg="http://unknown.irh/a/b/c/updated_image.png")
