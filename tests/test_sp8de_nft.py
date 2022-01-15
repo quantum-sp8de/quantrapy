@@ -50,7 +50,7 @@ class TestNFT(unittest.TestCase):
                                     fieldtypes="type",
                                     priorityimg="http://unknown.irh/a/b/c/image.png")
 
-    def test_authorupdate_user(self):
+    def test_authorupdate(self):
         r = TestNFT.q.authorupdate(NFT_ACCOUNT,
                                    "{'info': 'updated app info'}",
                                    fieldtypes="updated type",
@@ -58,9 +58,16 @@ class TestNFT(unittest.TestCase):
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 
-    def test_authorupdate_invalid_user(self):
+    def test_authorupdate_invalid_author(self):
         with self.assertRaises(ValueError) as cm:
             r = TestNFT.q.authorupdate(TestNFT.invalid_author,
                                        "{'info': 'updated app info'}",
                                        fieldtypes="updated type",
                                        priorityimg="http://unknown.irh/a/b/c/updated_image.png")
+
+    def test_setarampayer(self):
+        r = TestNFT.q.setarampayer(NFT_ACCOUNT,
+                                   category="test123",
+                                   usearam=True)
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')

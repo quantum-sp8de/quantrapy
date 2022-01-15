@@ -46,11 +46,11 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         """Update data for registered NFT author"""
         return self._author(author, dappinfo, fieldtypes, priorityimg, 'authorupdate')
 
-'''
     def setarampayer(self, author, category, usearam):
         arguments = {
             "author": _validate_s(author),
             "category": _validate_s(category),
+            "usearam": usearam
         }
         payload = {
             "account": self.contract_account,
@@ -62,4 +62,3 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         }
 
         return self._push_action_with_data(arguments, payload)
-'''
