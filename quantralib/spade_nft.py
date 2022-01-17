@@ -2,19 +2,21 @@ import string
 from .spade_base import EOSSP8DEBase
 
 
-_alphabet = string.ascii_lowercase + string.digits[1:6]
+_ALPHABET = string.ascii_lowercase + string.digits[1:6]
+
 
 def _validate_s(s):
     ''' Basic blockchain checking for valid syms in account names'''
     invalid = []
     for i,sym in enumerate(s):
-        if sym not in _alphabet:
+        if sym not in _ALPHABET:
             invalid.append("{} at index {}".format(sym, i))
     if invalid:
         er_desc = ";".join(invalid)
         raise ValueError("Invalid symbols found in name {}: {}".format(s, er_desc))
 
     return s
+
 
 class EOSSP8DE_NFT(EOSSP8DEBase):
     def __init__(self, account, contract_account, p_key, chain_url="http://localhost", chain_port=None):
@@ -48,6 +50,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._author(author, dappinfo, fieldtypes, priorityimg, 'authorupdate')
 
     def setarampayer(self, author, category, usearam):
+        """Set ram payer for NFTs"""
         arguments = {
             "author": _validate_s(author),
             "category": _validate_s(category),
@@ -65,6 +68,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def create(self, author, category, owner, idata, mdata, requireclaim):
+        """Create a new NFT"""
         arguments = {
             "author": _validate_s(author),
             "category": _validate_s(category),

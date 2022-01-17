@@ -16,6 +16,7 @@ NFT_CONTRACT = os.environ.get('TEST_NFT_CONTRACT', 'nft_contract')
 NFT_PKEY = os.environ.get('TEST_NFT_PKEY', 'your_private_key')
 NFT_CHAIN = os.environ.get('TEST_NFT_CHAIN', 'http://123.123.123.123:4444')
 NFT_ACCOUNT = os.environ.get('TEST_NFT_ACCOUNT', 'tester')
+NFT_NONEXISTENT_ACCOUNT = os.environ.get('TEST_NONEXISTENT_ACCOUNT', 'tester22')
 # ===
 
 class TestNFT(unittest.TestCase):
@@ -82,3 +83,15 @@ class TestNFT(unittest.TestCase):
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 
+    def test_create_nft_with_nonex_owner(self):
+        with self.assertRaises(requests.exceptions.HTTPError) as cm:
+            r = TestNFT.q.create(NFT_ACCOUNT,
+                                 category="test123",
+                                 owner=NFT_NONEXISTENT_ACCOUNT,
+                                 idata="{'somedata' : 'someoption'}",
+                                 mdata="{'somedata2' : 'someoption2'}",
+                                 requireclaim=True)
+
+        resp = cm.exception.response.json()
+        self.assertEqual(resp['code'], 500)
+        self.assertIn('owner account does not exist', resp['error']['details'][0]['message'])
