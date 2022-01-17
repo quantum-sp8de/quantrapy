@@ -5,6 +5,7 @@ from .spade_base import EOSSP8DEBase
 _alphabet = string.ascii_lowercase + string.digits[1:6]
 
 def _validate_s(s):
+    ''' Basic blockchain checking for valid syms in account names'''
     invalid = []
     for i,sym in enumerate(s):
         if sym not in _alphabet:
@@ -55,6 +56,26 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         payload = {
             "account": self.contract_account,
             "name": 'setarampayer',
+            "authorization": [{
+                "actor": self.account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def create(self, author, category, owner, idata, mdata, requireclaim):
+        arguments = {
+            "author": _validate_s(author),
+            "category": _validate_s(category),
+            "owner": _validate_s(owner),
+            "idata": idata,
+            "mdata": mdata,
+            "requireclaim": requireclaim
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'create',
             "authorization": [{
                 "actor": self.account,
                 "permission": "active",

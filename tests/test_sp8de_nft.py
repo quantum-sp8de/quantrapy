@@ -71,3 +71,14 @@ class TestNFT(unittest.TestCase):
                                    usearam=True)
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+    def test_create_nft(self):
+        r = TestNFT.q.create(NFT_ACCOUNT,
+                             category="test123",
+                             owner="creator",
+                             idata="{'somedata' : 'someoption'}",
+                             mdata="{'somedata2' : 'someoption2'}",
+                             requireclaim=True)
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
