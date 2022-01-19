@@ -16,7 +16,8 @@ NFT_CONTRACT = os.environ.get('TEST_NFT_CONTRACT', 'nft_contract')
 NFT_PKEY = os.environ.get('TEST_NFT_PKEY', 'your_private_key')
 NFT_CHAIN = os.environ.get('TEST_NFT_CHAIN', 'http://123.123.123.123:4444')
 NFT_ACCOUNT = os.environ.get('TEST_NFT_ACCOUNT', 'tester')
-NFT_NONEXISTENT_ACCOUNT = os.environ.get('TEST_NONEXISTENT_ACCOUNT', 'tester22')
+NFT_NONEXISTENT_ACCOUNT = os.environ.get('TEST_NFT_NONEXISTENT_ACCOUNT', 'tester22')
+NFT_OWNER = os.environ.get('TEST_NFT_OWNER', 'creator')
 # ===
 
 class TestNFT(unittest.TestCase):
@@ -76,7 +77,7 @@ class TestNFT(unittest.TestCase):
     def test_create_nft(self):
         r = TestNFT.q.create(NFT_ACCOUNT,
                              category="test123",
-                             owner="creator",
+                             owner=NFT_OWNER,
                              idata="{'somedata' : 'someoption'}",
                              mdata="{'somedata2' : 'someoption2'}",
                              requireclaim=True)
@@ -95,3 +96,21 @@ class TestNFT(unittest.TestCase):
         resp = cm.exception.response.json()
         self.assertEqual(resp['code'], 500)
         self.assertIn('owner account does not exist', resp['error']['details'][0]['message'])
+
+    def test_create_nft_update_invalid_assetid(self):
+        with self.assertRaises(requests.exceptions.HTTPError) as cm:
+            r = TestNFT.q.update(NFT_ACCOUNT,
+                                 owner=NFT_OWNER,
+                                 assetid=0, # 0 is likely to be an invalid assetid
+                                 mdata="{'somedata2' : 'someoption_updated2'}")
+
+        resp = cm.exception.response.json()
+        self.assertEqual(resp['code'], 500)
+        self.assertIn('not found', resp['error']['details'][0]['message'])
+
+    def test_create_nft_update_invalid_assetid2(self):
+        with self.assertRaises(ValueError) as cm:
+            r = TestNFT.q.update(NFT_ACCOUNT,
+                                 owner=NFT_OWNER,
+                                 assetid=(1<<64),
+                                 mdata="{'somedata2' : 'someoption_updated2'}")

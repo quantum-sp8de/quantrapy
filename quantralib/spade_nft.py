@@ -3,7 +3,7 @@ from .spade_base import EOSSP8DEBase
 
 
 _ALPHABET = string.ascii_lowercase + string.digits[1:6]
-
+_UINT64_MAX= (1 << 64) -1
 
 def _validate_s(s):
     ''' Basic blockchain checking for valid syms in account names'''
@@ -17,6 +17,24 @@ def _validate_s(s):
 
     return s
 
+def _validate_u64(s):
+    ret = None
+
+    try:
+        if isinstance(s, int):
+            ret = s
+        elif isinstance(s, str):
+            ret = int(s)
+    except Exception as ex:
+        raise ValueError("Invalid uint64 value {}: {}".format(s, ex)) from ex
+
+    if ret is None:
+        raise ValueError("Invalid type {} is not a uint64 compatible".format(type(s)))
+
+    if ret < 0 or ret > _UINT64_MAX:
+        raise ValueError("Invalid uint64 value {}: out of uint_64 range".format(s))
+
+    return ret
 
 class EOSSP8DE_NFT(EOSSP8DEBase):
     def __init__(self, account, contract_account, p_key, chain_url="http://localhost", chain_port=None):
@@ -80,6 +98,25 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         payload = {
             "account": self.contract_account,
             "name": 'create',
+            "authorization": [{
+                "actor": self.account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def update(self, author, owner, assetid, mdata):
+        """Update NFT info"""
+        arguments = {
+            "author": _validate_s(author),
+            "owner": _validate_s(owner),
+            "assetid": _validate_u64(assetid),
+            "mdata": mdata
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'update',
             "authorization": [{
                 "actor": self.account,
                 "permission": "active",
