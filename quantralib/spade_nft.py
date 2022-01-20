@@ -189,6 +189,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def undelegate(self, owner, assetids):
+        """Undelegate NFT ownership when delegate period is expired"""
         assetids = [_validate_u64(a) for a in assetids]
         owner = _validate_s(owner)
 
@@ -199,6 +200,26 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         payload = {
             "account": self.contract_account,
             "name": 'undelegate',
+            "authorization": [{
+                "actor": owner,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def delegatemore(self, owner, assetid, period):
+        """Delegate NFT asset for more period"""
+        owner = _validate_s(owner)
+
+        arguments = {
+            "owner": owner,
+            "assetidc": _validate_u64(assetid),
+            "period": _validate_u64(period)
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'delegatemore',
             "authorization": [{
                 "actor": owner,
                 "permission": "active",

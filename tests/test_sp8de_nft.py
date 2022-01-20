@@ -201,7 +201,7 @@ class TestNFT(unittest.TestCase):
         self.assertEqual(resp['code'], 500)
         self.assertIn('cannot be found', resp['error']['details'][0]['message'])
 
-    def test_nft_delegate_undelegate_assetids(self):
+    def test_nft_delegate_delegatemore_undelegate(self):
         last_assetid = TestNFT.get_last_assetid(NFT_OWNER)
         if last_assetid is None:
             logging.warning("No valid assetids found for {}, skipping {}".format(NFT_OWNER,
@@ -218,8 +218,14 @@ class TestNFT(unittest.TestCase):
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 
+        r = TestNFT.q.delegatemore(owner=NFT_OWNER,
+                                   assetid=last_assetid,
+                                   period=1)
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
         # make sure time is over
-        time.sleep(1)
+        time.sleep(2)
         r = TestNFT.q.undelegate(owner=NFT_OWNER, assetids=[last_assetid,])
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
