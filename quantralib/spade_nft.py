@@ -41,6 +41,9 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
         self.account = _validate_s(account)
 
+    def get_assets(self, account, limit=10):
+        return self.ce.get_table(self.contract_account, account, "sassets", limit=limit)
+
     def _author(self, author, dappinfo, fieldtypes, priorityimg, op_type):
         arguments = {
             "author": _validate_s(author),
@@ -132,8 +135,8 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         acc_to = _validate_s(acc_to)
 
         arguments = {
-            "to": _validate_s(acc_from),
-            "from": acc_to,
+            "to": acc_to,
+            "from": _validate_s(acc_from),
             "assetids": assetids,
             "memo": memo
         }
