@@ -27,8 +27,7 @@ class TestNFT(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        cls.q = EOSSP8DE_NFT(account=NFT_ACCOUNT,
-                             contract_account=NFT_CONTRACT,
+        cls.q = EOSSP8DE_NFT(contract_account=NFT_CONTRACT,
                              p_keys=NFT_PKEY,
                              chain_url=NFT_CHAIN,
                              chain_port=None)

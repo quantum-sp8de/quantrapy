@@ -37,16 +37,17 @@ def _validate_u64(s):
     return ret
 
 class EOSSP8DE_NFT(EOSSP8DEBase):
-    def __init__(self, account, contract_account, p_keys, chain_url="http://localhost", chain_port=None):
+    def __init__(self, contract_account, p_keys, chain_url="http://localhost", chain_port=None):
         EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
-        self.account = _validate_s(account)
 
     def get_assets(self, account, limit=10):
         return self.ce.get_table(self.contract_account, account, "sassets", limit=limit)
 
     def _author(self, author, dappinfo, fieldtypes, priorityimg, op_type):
+        author = _validate_s(author)
+
         arguments = {
-            "author": _validate_s(author),
+            "author": author,
             "dappinfo": dappinfo,
             "fieldtypes": fieldtypes,
             "priorityimg": priorityimg
@@ -55,7 +56,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
             "account": self.contract_account,
             "name": op_type,
             "authorization": [{
-                "actor": self.account,
+                "actor": author,
                 "permission": "active",
             }],
         }
@@ -72,8 +73,10 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
 
     def setarampayer(self, author, category, usearam):
         """Set ram payer for NFTs"""
+        author = _validate_s(author)
+
         arguments = {
-            "author": _validate_s(author),
+            "author": author,
             "category": _validate_s(category),
             "usearam": usearam
         }
@@ -81,7 +84,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
             "account": self.contract_account,
             "name": 'setarampayer',
             "authorization": [{
-                "actor": self.account,
+                "actor": author,
                 "permission": "active",
             }],
         }
@@ -90,8 +93,10 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
 
     def create(self, author, category, owner, idata, mdata, requireclaim):
         """Create a new NFT"""
+        author = _validate_s(author)
+
         arguments = {
-            "author": _validate_s(author),
+            "author": author,
             "category": _validate_s(category),
             "owner": _validate_s(owner),
             "idata": idata,
@@ -102,7 +107,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
             "account": self.contract_account,
             "name": 'create',
             "authorization": [{
-                "actor": self.account,
+                "actor": author,
                 "permission": "active",
             }],
         }
@@ -111,8 +116,10 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
 
     def update(self, author, owner, assetid, mdata):
         """Update NFT info"""
+        author = _validate_s(author)
+
         arguments = {
-            "author": _validate_s(author),
+            "author": author,
             "owner": _validate_s(owner),
             "assetid": _validate_u64(assetid),
             "mdata": mdata
@@ -121,7 +128,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
             "account": self.contract_account,
             "name": 'update',
             "authorization": [{
-                "actor": self.account,
+                "actor": author,
                 "permission": "active",
             }],
         }
@@ -133,10 +140,11 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         assetids = [_validate_u64(a) for a in assetids]
 
         acc_to = _validate_s(acc_to)
+        acc_from = _validate_s(acc_from)
 
         arguments = {
             "to": acc_to,
-            "from": _validate_s(acc_from),
+            "from": acc_from,
             "assetids": assetids,
             "memo": memo
         }
@@ -145,7 +153,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
             "name": 'transfer',
             "authorization": [
             {
-                "actor": self.account,
+                "actor": acc_from,
                 "permission": "active",
             },
             {
