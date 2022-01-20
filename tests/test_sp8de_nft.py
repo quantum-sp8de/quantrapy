@@ -44,6 +44,23 @@ class TestNFT(unittest.TestCase):
 
         return r['rows'][-1]['id']
 
+    @classmethod
+    def generate_invalid_assetids(cls, account):
+        """ Figure out 3 invalid asset ids for account"""
+        invalid_assetids = []
+
+        r = TestNFT.q.get_assets(account, limit=1000)
+        asset_ids = [ obj['id'] for obj in r['rows'] ]
+
+        # those in range 0...1000 are likely to be invalid ids, but check anyway this
+        for i in range(1000):
+            if i not in asset_ids:
+                invalid_assetids.append(i)
+                if len(invalid_assetids) == 3:
+                    break
+
+        return invalid_assetids
+
     def test_authorreg_existing_user(self):
         with self.assertRaises(requests.exceptions.HTTPError) as cm:
             r = TestNFT.q.authorreg(NFT_ACCOUNT,
@@ -164,16 +181,8 @@ class TestNFT(unittest.TestCase):
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 
-
     def test_nft_transfer_invalid_assetids(self):
-        r = TestNFT.q.get_assets(NFT_ACCOUNT, limit=1000)
-        asset_ids = [ obj['id'] for obj in r['rows'] ]
-
-        invalid_assetids = []
-        # those in range 0...10 are likely to be invalid ids, but check anyway this
-        for i in range(10):
-            if i not in asset_ids:
-                invalid_assetids.append(i)
+        invalid_assetids = TestNFT.generate_invalid_assetids(NFT_ACCOUNT)
 
         if not invalid_assetids:
             # no data - no test
@@ -191,3 +200,38 @@ class TestNFT(unittest.TestCase):
         self.assertEqual(resp['code'], 500)
         self.assertIn('cannot be found', resp['error']['details'][0]['message'])
 
+    def test_nft_delegate_assetids(self):
+        last_assetid = TestNFT.get_last_assetid(NFT_OWNER)
+        if last_assetid is None:
+            logging.warning("No valid assetids found for {}, skipping {}".format(NFT_OWNER,
+                                                                                 sys._getframe().f_code.co_name))
+            return
+
+        r = TestNFT.q.delegate(owner=NFT_OWNER,
+                               acc_to=NFT_ACCOUNT,
+                               assetids=[last_assetid,],
+                               period=55000,
+                               redelegate=False,
+                               memo="Delegating ownership just for fun")
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+    def test_nft_delegate_invalid_assets(self):
+        invalid_assetids = TestNFT.generate_invalid_assetids(NFT_OWNER)
+
+        if not invalid_assetids:
+            # no data - no test
+            logging.warning("There are no invalid assetids found for {} in range 0-10".format(NFT_ACCOUNT))
+            return
+
+        with self.assertRaises(requests.exceptions.HTTPError) as cm:
+            r = TestNFT.q.delegate(owner=NFT_OWNER,
+                                   acc_to=NFT_ACCOUNT,
+                                   assetids=invalid_assetids,
+                                   period=55000,
+                                   redelegate=False,
+                                   memo="Delegating ownership of invalid assets just for fun")
+
+        resp = cm.exception.response.json()
+        self.assertEqual(resp['code'], 500)
+        self.assertIn('cannot be found', resp['error']['details'][0]['message'])

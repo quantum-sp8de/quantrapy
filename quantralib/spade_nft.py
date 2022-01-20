@@ -138,7 +138,6 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
     def transfer(self, acc_from, acc_to, assetids, memo):
         """Transfer the NFT ownership"""
         assetids = [_validate_u64(a) for a in assetids]
-
         acc_to = _validate_s(acc_to)
         acc_from = _validate_s(acc_from)
 
@@ -160,6 +159,30 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
                 "actor": acc_to,
                 "permission": "active",
 
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def delegate(self, owner, acc_to, assetids, period, redelegate, memo):
+        """Delegate NFT ownership"""
+        assetids = [_validate_u64(a) for a in assetids]
+        owner = _validate_s(owner)
+
+        arguments = {
+            "owner": owner,
+            "to": _validate_s(acc_to),
+            "assetids": assetids,
+            "period": _validate_u64(period),
+            "redelegate": redelegate,
+            "memo": memo
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'delegate',
+            "authorization": [{
+                "actor": owner,
+                "permission": "active",
             }],
         }
 
