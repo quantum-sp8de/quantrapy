@@ -4,6 +4,7 @@ import os
 import sys
 import string
 import secrets
+import time
 import requests
 import logging
 import json
@@ -200,7 +201,7 @@ class TestNFT(unittest.TestCase):
         self.assertEqual(resp['code'], 500)
         self.assertIn('cannot be found', resp['error']['details'][0]['message'])
 
-    def test_nft_delegate_assetids(self):
+    def test_nft_delegate_undelegate_assetids(self):
         last_assetid = TestNFT.get_last_assetid(NFT_OWNER)
         if last_assetid is None:
             logging.warning("No valid assetids found for {}, skipping {}".format(NFT_OWNER,
@@ -210,9 +211,16 @@ class TestNFT(unittest.TestCase):
         r = TestNFT.q.delegate(owner=NFT_OWNER,
                                acc_to=NFT_ACCOUNT,
                                assetids=[last_assetid,],
-                               period=55000,
+                               period=1,
                                redelegate=False,
                                memo="Delegating ownership just for fun")
+
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+        # make sure time is over
+        time.sleep(1)
+        r = TestNFT.q.undelegate(owner=NFT_OWNER, assetids=[last_assetid,])
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 

@@ -187,3 +187,22 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         }
 
         return self._push_action_with_data(arguments, payload)
+
+    def undelegate(self, owner, assetids):
+        assetids = [_validate_u64(a) for a in assetids]
+        owner = _validate_s(owner)
+
+        arguments = {
+            "owner": owner,
+            "assetids": assetids,
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'undelegate',
+            "authorization": [{
+                "actor": owner,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
