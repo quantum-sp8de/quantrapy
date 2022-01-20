@@ -37,8 +37,8 @@ def _validate_u64(s):
     return ret
 
 class EOSSP8DE_NFT(EOSSP8DEBase):
-    def __init__(self, account, contract_account, p_key, chain_url="http://localhost", chain_port=None):
-        EOSSP8DEBase.__init__(self, contract_account, p_key, chain_url=chain_url, chain_port=chain_port)
+    def __init__(self, account, contract_account, p_keys, chain_url="http://localhost", chain_port=None):
+        EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
         self.account = _validate_s(account)
 
     def _author(self, author, dappinfo, fieldtypes, priorityimg, op_type):
@@ -120,6 +120,35 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
             "authorization": [{
                 "actor": self.account,
                 "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def transfer(self, acc_from, acc_to, assetids, memo):
+        """Transfer the NFT ownership"""
+        assetids = [_validate_u64(a) for a in assetids]
+
+        acc_to = _validate_s(acc_to)
+
+        arguments = {
+            "to": _validate_s(acc_from),
+            "from": acc_to,
+            "assetids": assetids,
+            "memo": memo
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'transfer',
+            "authorization": [
+            {
+                "actor": self.account,
+                "permission": "active",
+            },
+            {
+                "actor": acc_to,
+                "permission": "active",
+
             }],
         }
 

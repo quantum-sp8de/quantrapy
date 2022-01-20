@@ -2,8 +2,8 @@ from .cipher import xor_crypt_decode
 from .spade_base import EOSSP8DEBase
 
 class EOSRandom(EOSSP8DEBase):
-    def __init__(self, contract_account, p_key, tokens_account, chain_url="http://localhost", chain_port=None):
-        EOSSP8DEBase.__init__(self, contract_account, p_key, chain_url=chain_url, chain_port=chain_port)
+    def __init__(self, contract_account, p_keys, tokens_account, chain_url="http://localhost", chain_port=None):
+        EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
         self.tokens_account = tokens_account
 
     def check_if_validator(self, account):
