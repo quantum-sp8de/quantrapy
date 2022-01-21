@@ -249,3 +249,19 @@ class TestNFT(unittest.TestCase):
         resp = cm.exception.response.json()
         self.assertEqual(resp['code'], 500)
         self.assertIn('cannot be found', resp['error']['details'][0]['message'])
+
+    def test_nft_md_add_update_remove(self):
+        r = TestNFT.q.mdadd(author=NFT_ACCOUNT, data="Some additional data")
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+        md_id = r['processed']['action_traces'][0]['inline_traces'][1]['act']['data']['id']
+        r = TestNFT.q.mdupdate(md_id=md_id,
+                               author=NFT_ACCOUNT,
+                               data="Some additional data updated")
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+        r = TestNFT.q.mdremove(md_id=md_id, author=NFT_ACCOUNT)
+
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')

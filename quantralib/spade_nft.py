@@ -267,7 +267,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
 
         return self._push_action_with_data(arguments, payload)
 
-    def mdremove(self, md_id):
+    def mdremove(self, md_id, author):
         """Delete additional info of NFT author"""
         author = _validate_s(author)
 
