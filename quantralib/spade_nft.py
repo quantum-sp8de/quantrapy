@@ -227,3 +227,60 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         }
 
         return self._push_action_with_data(arguments, payload)
+
+    def mdadd(self, author, data):
+        """Add additional info to author"""
+        author = _validate_s(author)
+
+        arguments = {
+            "author": author,
+            "data": data
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'mdadd',
+            "authorization": [{
+                "actor": author,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def mdupdate(self, md_id, author, data):
+        """Update additional info of NFT author"""
+        author = _validate_s(author)
+
+        arguments = {
+            "id": _validate_u64(md_id),
+            "author": author,
+            "data": data
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'mdupdate',
+            "authorization": [{
+                "actor": author,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def mdremove(self, md_id):
+        """Delete additional info of NFT author"""
+        author = _validate_s(author)
+
+        arguments = {
+            "id": _validate_u64(md_id)
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'mdremove',
+            "authorization": [{
+                "actor": author,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
