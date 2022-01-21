@@ -102,12 +102,12 @@ class TestNFT(unittest.TestCase):
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 
-    def test_create_nft_self_owner(self):
+    def test_create_nft_self_owner_empty_mdata(self):
         r = TestNFT.q.create(NFT_ACCOUNT,
                              category="test123",
                              owner=NFT_ACCOUNT,
                              idata="{'somedata' : 'someoption'}",
-                             mdata="{'somedata2' : 'someoption2'}",
+                             mdata="",
                              requireclaim=False)
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
@@ -167,18 +167,22 @@ class TestNFT(unittest.TestCase):
                                  assetid=(1<<64),
                                  mdata="{'somedata2' : 'someoption_updated2'}")
 
-    def test_nft_transfer_assetids(self):
+    def test_nft_create_and_transfer_assetids(self):
         ''' Assuming that 'acc_from' and 'acc_to' accounts have both the same pkey '''
-        last_assetid = TestNFT.get_last_assetid(NFT_ACCOUNT)
-        if last_assetid is None:
-            logging.warning("No valid assetids found for {}, skipping {}".format(NFT_ACCOUNT,
-                                                                                 sys._getframe().f_code.co_name))
-            return
+        r = TestNFT.q.create(NFT_ACCOUNT,
+                             category="test555",
+                             owner=NFT_ACCOUNT,
+                             idata="{'somedata' : 'someoption555'}",
+                             mdata="{'somedata2' : 'someoption555'}",
+                             requireclaim=False)
 
+        self.assertEqual(r['processed']['receipt']['status'], 'executed')
+
+        asset_id = r['processed']['action_traces'][0]['inline_traces'][1]['act']['data']['assetid']
         r = TestNFT.q.transfer(acc_from=NFT_ACCOUNT,
-                       acc_to=NFT_OWNER,
-                       assetids=[last_assetid,],
-                       memo="Transfering just for fun")
+                               acc_to=NFT_OWNER,
+                               assetids=[asset_id,],
+                               memo="Transfering just for fun")
 
         self.assertEqual(r['processed']['receipt']['status'], 'executed')
 
