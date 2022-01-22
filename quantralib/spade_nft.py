@@ -284,3 +284,67 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         }
 
         return self._push_action_with_data(arguments, payload)
+
+
+class EOSSP8DE_NFT_EXCHANGE(EOSSP8DEBase):
+    def __init__(self, contract_account, p_keys, chain_url="http://localhost", chain_port=None):
+        EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
+
+    def get_lots(self, limit=10):
+        return self.ce.get_table(self.contract_account, self.contract_account, "lots", limit=limit)
+
+    def makelot(self, account, assetid, price, period):
+        """Create a new NFT lot"""
+        account = _validate_s(account)
+
+        arguments = {
+            "nft_id": _validate_u64(assetid),
+            "price": price,
+            "time_period": period
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'makelot',
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def cancellot(self, account, lot_id):
+        """Cancel NFT lot with specific lot id"""
+        account = _validate_s(account)
+
+        arguments = {
+            "lot_id": _validate_u64(lot_id)
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'cancellot',
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def returnfunds(self, account, asset_symbol):
+        """Return funds for the won NFT"""
+        account = _validate_s(account)
+
+        arguments = {
+            "asset_symbol": asset_symbol
+        }
+        payload = {
+            "account": self.contract_account,
+            "name": 'returnfunds',
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
