@@ -293,6 +293,9 @@ class EOSSP8DE_NFT_EXCHANGE(EOSSP8DEBase):
     def get_lots(self, limit=10):
         return self.ce.get_table(self.contract_account, self.contract_account, "lots", limit=limit)
 
+    def get_deposits(self, account, limit=10):
+        return self.ce.get_table(account, self.contract_account, "deposits", limit=limit)
+
     def makelot(self, account, assetid, price, period):
         """Create a new NFT lot"""
         account = _validate_s(account)
@@ -343,6 +346,29 @@ class EOSSP8DE_NFT_EXCHANGE(EOSSP8DEBase):
             "name": 'returnfunds',
             "authorization": [{
                 "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
+
+    def make_bet(self, account_from, account_to, depos, lotid, account_tokens='eosio.token'):
+        """Make a bet for NFT"""
+        account_from = _validate_s(account_from)
+        account_to = _validate_s(account_to)
+        account_tokens = _validate_s(account_tokens)
+
+        arguments = {
+            "from": account_from,
+            "to": account_to,
+            "quantity": depos,
+            "memo": str(_validate_u64(lotid))
+        }
+        payload = {
+            "account": account_tokens,
+            "name": "transfer",
+            "authorization": [{
+                "actor": account_from,
                 "permission": "active",
             }],
         }
