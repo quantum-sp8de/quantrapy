@@ -181,6 +181,14 @@ def cleos():
     getassets_nft = nft_subparsers.add_parser('getassets')
     getassets_nft.add_argument('account', type=str, action='store', help='account name')
     getassets_nft.add_argument('--limit', type=int, action='store', default=1000, dest='limit')
+    # nft authorreg
+    authorreg_nft = nft_subparsers.add_parser('authorreg')
+    authorreg_nft.add_argument('author', type=str, action='store', help='authors account who will create assets')
+    authorreg_nft.add_argument('dappinfo', type=str, action='store', help='stringified json; recommendations to include: game, company, logo, url, desc')
+    authorreg_nft.add_argument('fieldtypes', type=str, action='store',
+                               help='stringified json with key:state values, where key is key from mdata or idata and state indicates recommended way of displaying field')
+    authorreg_nft.add_argument('priorityimg', type=str, action='store', help='json with assosiation category with type of image or video')
+    authorreg_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
     # process args
     args = parser.parse_args()
@@ -328,6 +336,11 @@ def cleos():
 
         if args.nft == 'getassets':
             console_print(chain.get_assets(args.account, args.limit))
+        if args.nft == 'authorreg':
+            console_print(chain.authorreg(args.author,
+                                          args.dappinfo,
+                                          args.fieldtypes,
+                                          args.priorityimg))
 
 
 def testeos():
