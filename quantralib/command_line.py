@@ -164,15 +164,23 @@ def cleos():
     random_parser.add_argument('--contract_account', '-c', type=str, action='store', help='account with QRandom contract', default="quant.random")
     random_parser.add_argument('--tokens_account', '-t', type=str, action='store', help='account with tokens to operate within QRandom contract', default="eosio.token")
     random_subparsers = random_parser.add_subparsers(dest='random', help='Send (q)random action to the blockchain')
-    # getconfig
+    # random getconfig
     getconfig_random = random_subparsers.add_parser('getconfig')
-    # getrandom
+    # random getrandom
     getrandom_random = random_subparsers.add_parser('getrandom')
     getrandom_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
-    # buyrandom
+    # random buyrandom
     buy_random = random_subparsers.add_parser('buyrandom')
     buy_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
     buy_random.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft command
+    nft_parser = subparsers.add_parser('nft')
+    nft_parser.add_argument('--contract_account', '-c', type=str, action='store', help='account with NFT contract for actions', default="simpleassets")
+    nft_subparsers = nft_parser.add_subparsers(dest='nft', help='Send NFT manipulation actions to the blockchain')
+    # nft getassets
+    getassets_nft = nft_subparsers.add_parser('getassets')
+    getassets_nft.add_argument('account', type=str, action='store', help='account name')
+    getassets_nft.add_argument('--limit', type=int, action='store', default=1000, dest='limit')
 
     # process args
     args = parser.parse_args()
@@ -287,6 +295,7 @@ def cleos():
         elif args.system == 'listproducers':
             resp = ce.get_producers(lower_bound=args.lower_bound, limit=args.limit)
             console_print(resp)
+    # RANDOM
     elif args.subparser == 'random':
         from .erandom import EOSRandom
         if args.random == 'buyrandom':
@@ -305,6 +314,21 @@ def cleos():
             console_print(chain.get_randresult(account=args.account))
         if args.random == 'buyrandom':
             console_print(chain.buy_random(account=args.account))
+    # NFT
+    elif args.subparser == 'nft':
+        from .spade_nft import EOSSP8DE_NFT
+
+        priv_keys=[]
+        if hasattr(args, 'key_file'):
+            priv_keys = parse_key_file(args.key_file)
+
+        chain = EOSSP8DE_NFT(contract_account=args.contract_account,
+                             p_keys=priv_keys,
+                             chain_url=args.url)
+
+        if args.nft == 'getassets':
+            console_print(chain.get_assets(args.account, args.limit))
+
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
