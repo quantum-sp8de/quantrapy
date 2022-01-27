@@ -189,6 +189,14 @@ def cleos():
                                help='stringified json with key:state values, where key is key from mdata or idata and state indicates recommended way of displaying field')
     authorreg_nft.add_argument('priorityimg', type=str, action='store', help='json with assosiation category with type of image or video')
     authorreg_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft authorupdate
+    authorupdate_nft = nft_subparsers.add_parser('authorupdate')
+    authorupdate_nft.add_argument('author', type=str, action='store', help='authors account who will create assets')
+    authorupdate_nft.add_argument('dappinfo', type=str, action='store', help='stringified json; recommendations to include: game, company, logo, url, desc')
+    authorupdate_nft.add_argument('fieldtypes', type=str, action='store',
+                               help='stringified json with key:state values, where key is key from mdata or idata and state indicates recommended way of displaying field')
+    authorupdate_nft.add_argument('priorityimg', type=str, action='store', help='json with assosiation category with type of image or video')
+    authorupdate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
     # process args
     args = parser.parse_args()
@@ -341,7 +349,11 @@ def cleos():
                                           args.dappinfo,
                                           args.fieldtypes,
                                           args.priorityimg))
-
+        if args.nft == 'authorupdate':
+            console_print(chain.authorupdate(args.author,
+                                             args.dappinfo,
+                                             args.fieldtypes,
+                                             args.priorityimg))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
