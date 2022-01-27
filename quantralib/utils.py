@@ -1,6 +1,7 @@
 from binascii import hexlify
 import struct
 import hashlib
+import itertools
 import six
 from .exceptions import InvalidKeyFile
 
@@ -141,6 +142,22 @@ def name_to_string(n):
         n >>= 4 if i == 0 else 5
         i += 1
     return ''.join(name).rstrip('.')
+
+
+_true_choices = ("true", "True", "TRUE", "yes", "1")
+_false_choices = ("false", "False", "FALSE", "no", "0")
+
+def str2bool(value):
+    value = value.strip()
+
+    for i, x in enumerate(itertools.chain(_true_choices, _false_choices)):
+        if x == value:
+            break
+    else:
+        raise ValueError("Value {} can not be converted to bool".format(value))
+
+    return i < len(_true_choices)
+
 
 # if six.PY3 :
 #     def _byte(b) :

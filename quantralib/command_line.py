@@ -1,7 +1,7 @@
 import argparse
 from .cleos import Cleos
 from .testeos import TestEos
-from .utils import parse_key_file
+from .utils import parse_key_file, str2bool
 from .exceptions import InvalidPermissionFormat, EOSSetSameAbi, EOSSetSameCode
 import json
 
@@ -191,12 +191,19 @@ def cleos():
     authorreg_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
     # nft authorupdate
     authorupdate_nft = nft_subparsers.add_parser('authorupdate')
-    authorupdate_nft.add_argument('author', type=str, action='store', help='authors account who will create assets')
+    authorupdate_nft.add_argument('author', type=str, action='store', help='authors account who will be updated')
     authorupdate_nft.add_argument('dappinfo', type=str, action='store', help='stringified json; recommendations to include: game, company, logo, url, desc')
     authorupdate_nft.add_argument('fieldtypes', type=str, action='store',
                                help='stringified json with key:state values, where key is key from mdata or idata and state indicates recommended way of displaying field')
     authorupdate_nft.add_argument('priorityimg', type=str, action='store', help='json with assosiation category with type of image or video')
     authorupdate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft setarampayer
+    setarampayer_nft = nft_subparsers.add_parser('setarampayer')
+    setarampayer_nft.add_argument('author', type=str, action='store', help="asset's author, who will able to update asset's mdata")
+    setarampayer_nft.add_argument('category', type=str, action='store', help='assets category')
+    setarampayer_nft.add_argument('usearam', type=str2bool, action='store', help='flag for on or off author is a ram payer functionaity')
+    setarampayer_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+
 
     # process args
     args = parser.parse_args()
@@ -354,6 +361,11 @@ def cleos():
                                              args.dappinfo,
                                              args.fieldtypes,
                                              args.priorityimg))
+
+        if args.nft == 'setarampayer':
+            console_print(chain.setarampayer(args.author,
+                                             args.category,
+                                             args.usearam))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
