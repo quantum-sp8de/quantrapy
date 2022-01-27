@@ -203,6 +203,17 @@ def cleos():
     setarampayer_nft.add_argument('category', type=str, action='store', help='assets category')
     setarampayer_nft.add_argument('usearam', type=str2bool, action='store', help='flag for on or off author is a ram payer functionaity')
     setarampayer_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft create
+    create_nft = nft_subparsers.add_parser('create')
+    create_nft.add_argument('author', type=str, action='store', help="asset's author, who will able to updated asset's mdata")
+    create_nft.add_argument('category', type=str, action='store', help='assets category')
+    create_nft.add_argument('owner', type=str, action='store', help='assets owner')
+    create_nft.add_argument('idata', type=str, action='store', help='stringified json with immutable assets data')
+    create_nft.add_argument('mdata', type=str, action='store', help='stringified json with mutable assets data, can be changed only by author')
+    create_nft.add_argument('requireclaim', type=str2bool, action='store',
+                            help="true or false. If disabled, the asset will be transfered to owner, otherwise author will remain the owner, \
+                                  but an offer will be created for the account specified in the owner field to claim the asset using the account's RAM")
+    create_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -366,6 +377,13 @@ def cleos():
             console_print(chain.setarampayer(args.author,
                                              args.category,
                                              args.usearam))
+        if args.nft == 'create':
+            console_print(chain.create(author=args.author,
+                                       category=args.category,
+                                       owner=args.owner,
+                                       idata=args.idata,
+                                       mdata=args.mdata,
+                                       requireclaim=args.requireclaim))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
