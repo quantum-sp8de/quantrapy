@@ -413,20 +413,20 @@ def cleos():
         if args.nft == 'getassets':
             console_print(chain.get_assets(args.account, args.limit))
         if args.nft == 'authorreg':
-            console_print(chain.authorreg(args.author,
-                                          args.dappinfo,
-                                          args.fieldtypes,
-                                          args.priorityimg))
+            console_print(chain.authorreg(author=args.author,
+                                          dappinfo=args.dappinfo,
+                                          fieldtypes=args.fieldtypes,
+                                          priorityimg=args.priorityimg))
         if args.nft == 'authorupdate':
-            console_print(chain.authorupdate(args.author,
-                                             args.dappinfo,
-                                             args.fieldtypes,
-                                             args.priorityimg))
+            console_print(chain.authorupdate(author=args.author,
+                                             dappinfo=args.dappinfo,
+                                             fieldtypes=args.fieldtypes,
+                                             priorityimg=args.priorityimg))
 
         if args.nft == 'setarampayer':
-            console_print(chain.setarampayer(args.author,
-                                             args.category,
-                                             args.usearam))
+            console_print(chain.setarampayer(author=args.author,
+                                             category=args.category,
+                                             usearam=args.usearam))
         if args.nft == 'create':
             console_print(chain.create(author=args.author,
                                        category=args.category,
