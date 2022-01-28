@@ -237,6 +237,11 @@ def cleos():
     delegate_nft.add_argument('redelegate', type=str2bool, action='store', help='boolean, True if assetids can be re-delegated')
     delegate_nft.add_argument('memo', type=str, action='store', help='memo for delegate action')
     delegate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft undelegate
+    undelegate_nft = nft_subparsers.add_parser('undelegate')
+    undelegate_nft.add_argument('owner', type=str, action='store', help='real asset owner account')
+    undelegate_nft.add_argument('assetids', nargs='+', type=int, help="assetid's to undelegate")
+    undelegate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -424,6 +429,10 @@ def cleos():
                                          period=args.period,
                                          redelegate=args.redelegate,
                                          memo=args.memo))
+        if args.nft == 'undelegate':
+            console_print(chain.undelegate(owner=args.owner,
+                                         assetids=args.assetids))
+
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
