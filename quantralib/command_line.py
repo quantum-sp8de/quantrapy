@@ -259,6 +259,11 @@ def cleos():
     mdupdate_nft.add_argument('author', type=str, action='store', help=' authors account')
     mdupdate_nft.add_argument('data', type=str, action='store', help="stringified json with mutable assets data")
     mdupdate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft mdremove
+    mdremove_nft = nft_subparsers.add_parser('mdremove')
+    mdremove_nft.add_argument('md_id', type=int, action='store', help='id of more data to be removed')
+    mdremove_nft.add_argument('author', type=str, action='store', help=' authors account')
+    mdremove_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -460,6 +465,10 @@ def cleos():
             console_print(chain.mdupdate(md_id=args.md_id,
                                          author=args.author,
                                          data=args.data))
+        if args.nft == 'mdremove':
+            console_print(chain.mdremove(md_id=args.md_id,
+                                         author=args.author))
+
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
