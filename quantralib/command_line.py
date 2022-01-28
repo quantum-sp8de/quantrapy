@@ -214,6 +214,13 @@ def cleos():
                             help="true or false. If disabled, the asset will be transfered to owner, otherwise author will remain the owner, \
                                   but an offer will be created for the account specified in the owner field to claim the asset using the account's RAM")
     create_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft update
+    update_nft = nft_subparsers.add_parser('update')
+    update_nft.add_argument('author', type=str, action='store', help="authors account")
+    update_nft.add_argument('owner', type=str, action='store', help='current assets owner')
+    update_nft.add_argument('assetid', type=int, action='store', help='assetid to update')
+    update_nft.add_argument('mdata', type=str, action='store', help='stringified json with mutable assets data. All mdata will be replaced')
+    update_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -384,6 +391,11 @@ def cleos():
                                        idata=args.idata,
                                        mdata=args.mdata,
                                        requireclaim=args.requireclaim))
+        if args.nft == 'update':
+            console_print(chain.update(author=args.author,
+                                       owner=args.owner,
+                                       assetid=args.assetid,
+                                       mdata=args.mdata))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
