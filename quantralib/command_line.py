@@ -221,6 +221,13 @@ def cleos():
     update_nft.add_argument('assetid', type=int, action='store', help='assetid to update')
     update_nft.add_argument('mdata', type=str, action='store', help='stringified json with mutable assets data. All mdata will be replaced')
     update_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft transfer
+    transfer_nft = nft_subparsers.add_parser('transfer')
+    transfer_nft.add_argument('account_from', type=str, action='store', help='account who sends the asset')
+    transfer_nft.add_argument('account_to', type=str, action='store', help='account of receiver')
+    transfer_nft.add_argument('assetids', nargs='+', type=int, help="assetid's to transfer")
+    transfer_nft.add_argument('memo', type=str, action='store', help='transfers comment')
+    transfer_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -396,6 +403,11 @@ def cleos():
                                        owner=args.owner,
                                        assetid=args.assetid,
                                        mdata=args.mdata))
+        if args.nft == 'transfer':
+            console_print(chain.transfer(acc_from=args.account_from,
+                                         acc_to=args.account_to,
+                                         assetids=args.assetids,
+                                         memo=args.memo))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
