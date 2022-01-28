@@ -248,6 +248,11 @@ def cleos():
     delegatemore_nft.add_argument('assetid', type=int, action='store', help="assetid to delegate")
     delegatemore_nft.add_argument('period', type=int, action='store', help="time in seconds that the asset will be lent")
     delegatemore_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft mdadd
+    mdadd_nft = nft_subparsers.add_parser('mdadd')
+    mdadd_nft.add_argument('author', type=str, action='store', help=' authors account')
+    mdadd_nft.add_argument('data', type=str, action='store', help="stringified json with mutable assets data")
+    mdadd_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -441,7 +446,10 @@ def cleos():
         if args.nft == 'delegatemore':
             console_print(chain.delegatemore(owner=args.owner,
                                              assetid=args.assetid,
-                                             period=args.period,))
+                                             period=args.period))
+        if args.nft == 'mdadd':
+            console_print(chain.mdadd(author=args.author,
+                                      data=args.data))
 
 
 def testeos():
