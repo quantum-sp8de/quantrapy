@@ -250,9 +250,15 @@ def cleos():
     delegatemore_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
     # nft mdadd
     mdadd_nft = nft_subparsers.add_parser('mdadd')
-    mdadd_nft.add_argument('author', type=str, action='store', help=' authors account')
+    mdadd_nft.add_argument('author', type=str, action='store', help='authors account')
     mdadd_nft.add_argument('data', type=str, action='store', help="stringified json with mutable assets data")
     mdadd_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft mdupdate
+    mdupdate_nft = nft_subparsers.add_parser('mdupdate')
+    mdupdate_nft.add_argument('md_id', type=int, action='store', help='id of more data')
+    mdupdate_nft.add_argument('author', type=str, action='store', help=' authors account')
+    mdupdate_nft.add_argument('data', type=str, action='store', help="stringified json with mutable assets data")
+    mdupdate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -450,7 +456,10 @@ def cleos():
         if args.nft == 'mdadd':
             console_print(chain.mdadd(author=args.author,
                                       data=args.data))
-
+        if args.nft == 'mdupdate':
+            console_print(chain.mdupdate(md_id=args.md_id,
+                                         author=args.author,
+                                         data=args.data))
 
 def testeos():
     parser = argparse.ArgumentParser(description='EOSIO testing harness')
