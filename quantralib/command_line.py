@@ -242,6 +242,12 @@ def cleos():
     undelegate_nft.add_argument('owner', type=str, action='store', help='real asset owner account')
     undelegate_nft.add_argument('assetids', nargs='+', type=int, help="assetid's to undelegate")
     undelegate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft delegatemore
+    delegatemore_nft = nft_subparsers.add_parser('delegatemore')
+    delegatemore_nft.add_argument('owner', type=str, action='store', help='current asset owner account')
+    delegatemore_nft.add_argument('assetid', type=int, action='store', help="assetid to delegate")
+    delegatemore_nft.add_argument('period', type=int, action='store', help="time in seconds that the asset will be lent")
+    delegatemore_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -432,6 +438,10 @@ def cleos():
         if args.nft == 'undelegate':
             console_print(chain.undelegate(owner=args.owner,
                                          assetids=args.assetids))
+        if args.nft == 'delegatemore':
+            console_print(chain.delegatemore(owner=args.owner,
+                                             assetid=args.assetid,
+                                             period=args.period,))
 
 
 def testeos():
