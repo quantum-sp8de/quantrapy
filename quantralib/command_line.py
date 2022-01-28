@@ -228,6 +228,15 @@ def cleos():
     transfer_nft.add_argument('assetids', nargs='+', type=int, help="assetid's to transfer")
     transfer_nft.add_argument('memo', type=str, action='store', help='transfers comment')
     transfer_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # nft delegate
+    delegate_nft = nft_subparsers.add_parser('delegate')
+    delegate_nft.add_argument('owner', type=str, action='store', help='current asset owner account')
+    delegate_nft.add_argument('account_to', type=str, action='store', help='borrower account name')
+    delegate_nft.add_argument('assetids', nargs='+', type=int, help="assetid's to delegate")
+    delegate_nft.add_argument('period', type=int, action='store', help="time in seconds that the asset will be lent")
+    delegate_nft.add_argument('redelegate', type=str2bool, action='store', help='boolean, True if assetids can be re-delegated')
+    delegate_nft.add_argument('memo', type=str, action='store', help='memo for delegate action')
+    delegate_nft.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
 
 
     # process args
@@ -407,6 +416,13 @@ def cleos():
             console_print(chain.transfer(acc_from=args.account_from,
                                          acc_to=args.account_to,
                                          assetids=args.assetids,
+                                         memo=args.memo))
+        if args.nft == 'delegate':
+            console_print(chain.delegate(owner=args.owner,
+                                         acc_to=args.account_to,
+                                         assetids=args.assetids,
+                                         period=args.period,
+                                         redelegate=args.redelegate,
                                          memo=args.memo))
 
 def testeos():
