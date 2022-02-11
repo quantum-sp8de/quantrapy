@@ -72,7 +72,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._author(author, dappinfo, fieldtypes, priorityimg, 'authorupdate')
 
     def setarampayer(self, author, category, usearam):
-        """Set ram payer for NFTs"""
+        """Action for setting a ram payer for author and category"""
         author = _validate_s(author)
 
         arguments = {
@@ -115,7 +115,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def update(self, author, owner, assetid, mdata):
-        """Update NFT info"""
+        """Update assets mutable data (mdata) field. Action is available only for authors"""
         author = _validate_s(author)
 
         arguments = {
@@ -165,7 +165,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def delegate(self, owner, acc_to, assetids, period, redelegate, memo):
-        """Delegate NFT ownership"""
+        """Delegates NFT ownership"""
         assetids = [_validate_u64(a) for a in assetids]
         owner = _validate_s(owner)
 
@@ -189,7 +189,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def undelegate(self, owner, assetids):
-        """Undelegate NFT ownership when delegate period is expired"""
+        """Undelegates NFT ownership when delegated period is expired"""
         assetids = [_validate_u64(a) for a in assetids]
         owner = _validate_s(owner)
 
@@ -209,7 +209,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def delegatemore(self, owner, assetid, period):
-        """Delegate NFT asset for more period"""
+        """Extend period of delegating of asset"""
         owner = _validate_s(owner)
 
         arguments = {
@@ -229,7 +229,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def mdadd(self, author, data):
-        """Add additional info to author"""
+        """Create new more data"""
         author = _validate_s(author)
 
         arguments = {
@@ -248,7 +248,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def mdupdate(self, md_id, author, data):
-        """Update additional info of NFT author"""
+        """Update existing more data"""
         author = _validate_s(author)
 
         arguments = {
@@ -268,7 +268,7 @@ class EOSSP8DE_NFT(EOSSP8DEBase):
         return self._push_action_with_data(arguments, payload)
 
     def mdremove(self, md_id, author):
-        """Delete additional info of NFT author"""
+        """Delete more data of NFT author"""
         author = _validate_s(author)
 
         arguments = {
