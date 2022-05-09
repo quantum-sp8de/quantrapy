@@ -130,16 +130,23 @@ class EOSRandom(EOSSP8DEBase):
 
 
     def _set_dynamic_pubkey(self, account, pubkey, key_type):
-        authority = {
-            "threshold": "1",
-            "accounts": [],
-            "keys": [{
-                "key": pubkey,
-                "weight": "1"
-            }],
-            "waits": []
+        """Set the new pass for random decrypt value"""
+
+        arguments = {
+            "account": account,
+            "encrypt": ("", pubkey)[key_type == "encrypt"],
+            "backup":  ("", pubkey)[key_type == "backup"],
         }
-        return self._set_account_permission(account, key_type, authority)
+        payload = {
+            "account": self.contract_account,
+            "name": "setacctpass",
+            "authorization": [{
+                "actor": account,
+                "permission": "active",
+            }],
+        }
+
+        return self._push_action_with_data(arguments, payload)
 
     def set_dynamic_encrypt_pubkey(self, account, pubkey):
         return self._set_dynamic_pubkey(account, pubkey, 'encrypt')
@@ -148,13 +155,11 @@ class EOSRandom(EOSSP8DEBase):
         return self._set_dynamic_pubkey(account, pubkey, 'backup')
 
     def _get_dynamic_pubkey(self, account, key_type):
-        key = None
-        acc_info = self.ce.get_account(account)
-        for perm in acc_info['permissions']:
-            if key_type == perm['perm_name']:
-                key = perm["required_auth"]["keys"][-1]["key"]
-
-        return key
+        r = self.ce.get_table(self.contract_account, account, "acctpass")
+        try:
+            return r["rows"][0][key_type]
+        except:
+            return ''
 
     def get_dynamic_encrypt_pubkey(self, account):
         return self._get_dynamic_pubkey(account, 'encrypt')
