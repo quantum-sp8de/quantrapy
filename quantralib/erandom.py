@@ -158,8 +158,8 @@ class EOSRandom(EOSSP8DEBase):
         r = self.ce.get_table(self.contract_account, account, "acctpass")
         try:
             return r["rows"][0][key_type]
-        except:
-            return ''
+        except Exception:
+            return None
 
     def get_dynamic_encrypt_pubkey(self, account):
         return self._get_dynamic_pubkey(account, 'encrypt')
