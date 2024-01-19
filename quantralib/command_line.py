@@ -173,6 +173,17 @@ def cleos():
     buy_random = random_subparsers.add_parser('buyrandom')
     buy_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
     buy_random.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
+    # 2FA commands
+    twofa_parser = subparsers.add_parser('2fa')
+    twofa_parser.add_argument('--contract_account', '-c', type=str, action='store', help='account with 2FA contract', default="quant.twofa")
+    twofa_subparsers = twofa_parser.add_subparsers(dest='twofa', help='')
+    # 2FA generate
+    generate_2fa_random = twofa_parser.add_parser('generate')
+    generate_2fa_random.add_argument('owner', type=str, action='store', help='account name to generate 2FA code')
+    # 2FA validate
+    validate_2fa_random = twofa_parser.add_parser('validate')
+    generate_2fa_random.add_argument('owner', type=str, action='store', help='account name who validate 2FA code')
+    generate_2fa_random.add_argument('twofa_code', type=str, action='store', help='2FA code')
     # nft command
     nft_parser = subparsers.add_parser('nft')
     nft_parser.add_argument('--contract_account', '-c', type=str, action='store', help='account with NFT contract for actions', default="simpleassets")
@@ -398,6 +409,17 @@ def cleos():
             console_print(chain.get_randresult(account=args.account))
         if args.random == 'buyrandom':
             console_print(chain.buy_random(account=args.account))
+    #2FA
+    elif args.subparser == '2fa':
+        from .twofa import TwoFA
+        chain = TwoFA(args.contract_account,
+                     p_key=priv_key,
+                     twofa_account=args.owner,
+                     chain_url=args.url)
+        if args.twofa == 'generate':
+            console_print(chain.generate())
+        if args.twofa == 'validate':
+            console_print(chain.validate(twofa_code=args.twofa_code))                  
     # NFT
     elif args.subparser == 'nft':
         from .spade_nft import EOSSP8DE_NFT
