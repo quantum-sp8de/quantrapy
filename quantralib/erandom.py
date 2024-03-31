@@ -6,10 +6,10 @@ class EOSRandom(EOSSP8DEBase):
         EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
         self.tokens_account = tokens_account
 
-    def check_if_validator(self, account):
+    def check_if_generator(self, account):
         """Check if account is already registered to generate randoms"""
         ret = False
-        r = self.ce.get_table(self.contract_account, self.contract_account, "validators")
+        r = self.ce.get_table(self.contract_account, self.contract_account, "generators")
 
         for r in r['rows']:
             if r.get("owner") == account:
@@ -25,20 +25,16 @@ class EOSRandom(EOSSP8DEBase):
         return self.ce.get_table(self.contract_account, self.contract_account, "config")
 
     def get_config_keystable(self):
-        return self.ce.get_table(self.contract_account, self.contract_account, "keysconfig")
+        return self.ce.get_table(self.contract_account, self.contract_account, "confencrypt")
 
     def get_rkeys(self, account):
-        return self.ce.get_table(self.contract_account, account, "keys")
+        return self.ce.get_table(self.contract_account, account, "generatorkey")
 
     def get_config_table_value(self, value):
         r = self.get_config_table()
         ret = r['rows'][0][value]
 
         return ret
-
-    def get_minimal_deposit(self):
-        """Returns the minimal price for registration as random value generator"""
-        return self.get_config_table_value("minimal_deposit")
 
     def get_random_price(self):
         """Returns the price for buying a random value"""
@@ -57,7 +53,7 @@ class EOSRandom(EOSSP8DEBase):
 
     def get_randresult(self, account):
         """Get the bought decrypted random value for account"""
-        r = self.ce.get_table(self.contract_account, account, "randresult2")
+        r = self.ce.get_table(self.contract_account, account, "randresult")
         owner = r['rows'][0]["owner"]
         en_value = r['rows'][0]["value"].strip()
 
@@ -74,17 +70,15 @@ class EOSRandom(EOSSP8DEBase):
 
         return ret
 
-    def register_as_validator(self, account, depos):
+    def register_as_generator(self, account, public_key):
         """Register account to be able generate and send randoms"""
         arguments = {
-            "from": account,
-            "to": self.contract_account,
-            "quantity": depos,
-            "memo": "registration"
+            "owner": account,
+            "pk": public_key
         }
         payload = {
-            "account": self.tokens_account,
-            "name": "transfer",
+            "account": self.contract_account,
+            "name": "reggenerator",
             "authorization": [{
                 "actor": account,
                 "permission": "active",
@@ -93,11 +87,12 @@ class EOSRandom(EOSSP8DEBase):
 
         return self._push_action_with_data(arguments, payload)
 
-    def setrandom(self, random_num, account, pin):
+    def setrandom(self, random_num, account, sign, pin):
         """Set the new value in QRandom subsystem"""
         arguments = {
             "owner": account,
             "value": str(random_num),
+            "sign": sign,
             "password": pin,
         }
         payload = {
@@ -111,7 +106,7 @@ class EOSRandom(EOSSP8DEBase):
 
         return self._push_action_with_data(arguments, payload)
 
-    def setuserkey(self, account, generator, key):
+    def setgenkey(self, account, generator, key):
         """Set the new key for random values for a specific generator"""
         arguments = {
             "generator": generator,
@@ -119,7 +114,7 @@ class EOSRandom(EOSSP8DEBase):
         }
         payload = {
             "account": self.contract_account,
-            "name": "setuserkey",
+            "name": "setgenkey",
             "authorization": [{
                 "actor": account,
                 "permission": "active",
@@ -127,7 +122,6 @@ class EOSRandom(EOSSP8DEBase):
         }
 
         return self._push_action_with_data(arguments, payload)
-
 
     def _set_dynamic_pubkey(self, account, pubkey, key_type):
         """Set the new pass for random decrypt value"""
