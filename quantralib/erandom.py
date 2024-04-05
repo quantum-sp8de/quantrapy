@@ -1,5 +1,7 @@
 from .cipher import xor_crypt_decode
 from .spade_base import EOSSP8DEBase
+from .keys import pubkey_to_eospubkey
+
 
 class EOSRandom(EOSSP8DEBase):
     def __init__(self, contract_account, p_keys, tokens_account, chain_url="http://localhost", chain_port=None):
@@ -74,7 +76,7 @@ class EOSRandom(EOSSP8DEBase):
         """Register account to be able generate and send randoms"""
         arguments = {
             "owner": account,
-            "pk": public_key
+            "pk": pubkey_to_eospubkey(public_key)
         }
         payload = {
             "account": self.contract_account,

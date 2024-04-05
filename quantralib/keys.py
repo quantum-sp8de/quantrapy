@@ -23,6 +23,21 @@ def check_wif(key) :
             pass
     return False
 
+def pubkey_to_eospubkey(pub_key, curve=ecdsa.NIST256p):
+    ''' Converts pub_key to the relevant EOS public key
+
+        pub_key: str - string represantation of ECDSA pub key
+        curve: ecdsa.curves.Curve - ECDSA curve
+        returns: str - EOS public key
+    '''
+
+    vk = ecdsa.VerifyingKey.from_string(unhexlify(pub_key.encode()), curve=curve)
+    order = vk.curve.generator.order()
+    p = vk.pubkey.point
+    comp = EOSKey.do_compress_pubkey(order, p)
+
+    return 'EOS' + EOSKey._check_encode(None, comp).decode()
+
 
 class EOSKey(Signer):
     def __init__(self, private_str=''):
@@ -137,9 +152,15 @@ class EOSKey(Signer):
         ''' '''
         order = self._sk.curve.generator.order()
         p = self._vk.pubkey.point
+
+        return self.do_compress_pubkey(order, p)
+
+    @staticmethod
+    def do_compress_pubkey(order, p):
         x_str = ecdsa.util.number_to_string(p.x(), order)
         hex_data = bytearray(chr(2 + (p.y() & 1)), 'utf-8')
         compressed = hexlify(hex_data + x_str).decode()
+
         return compressed
 
     def _is_canonical(self, sig):
