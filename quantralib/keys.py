@@ -3,7 +3,7 @@ import os
 import ecdsa
 import re
 from binascii import hexlify, unhexlify
-from .utils import sha256, ripemd160
+from .utils import sha256, ripemd160, int_to_hex
 from .signer import Signer
 import hashlib
 import struct
@@ -116,12 +116,29 @@ class EOSKey(Signer):
         return key
 
     def _recover_key(self, digest, signature, i):
+        return self.recover_key(self._curve, digest, signature, i)
+
+    def _recovery_pubkey_param(self, digest, signature) :
+        return self.recovery_pubkey_param(self._vk.to_string(), digest, signature, self._curve)
+
+    @staticmethod
+    def recovery_pubkey_param(pubkey, digest, signature, curve):
+        ''' Use to derive a number that will allow for the easy recovery
+            of the public key from the signature
+        '''
+        for i in range(0, 4):
+            p = EOSKey.recover_key(curve, digest, signature, i)
+            if (p.to_string() == pubkey):
+                return i
+
+    @staticmethod
+    def recover_key(_curve, digest, signature, i):
         ''' Recover the public key from the sig
             http://www.secg.org/sec1-v2.pdf
         '''
-        curve = self._curve.curve
-        G = self._curve.generator
-        order = self._curve.order
+        curve = _curve.curve
+        G = _curve.generator
+        order = _curve.order
         yp = (i %2)
         r, s = ecdsa.util.sigdecode_string(signature, order)
         x = r + (i // 2) * order
@@ -134,19 +151,11 @@ class EOSKey(Signer):
         # compute Q
         Q = ecdsa.numbertheory.inverse_mod(r, order) * (s * R + (-e % order) * G)
         # verify message
-        if not ecdsa.VerifyingKey.from_public_point(Q, curve=self._curve).verify_digest(signature, digest,
+        if not ecdsa.VerifyingKey.from_public_point(Q, curve=_curve).verify_digest(signature, digest,
                                                                                             sigdecode=ecdsa.util.sigdecode_string) :
             return None
-        return ecdsa.VerifyingKey.from_public_point(Q, curve=self._curve)
-        
-    def _recovery_pubkey_param(self, digest, signature) :
-        ''' Use to derive a number that will allow for the easy recovery
-            of the public key from the signature
-        '''
-        for i in range(0, 4):
-            p = self._recover_key(digest, signature, i)
-            if (p.to_string() == self._vk.to_string()):
-                return i
+        return ecdsa.VerifyingKey.from_public_point(Q, curve=_curve)
+
 
     def _compress_pubkey(self):
         ''' '''
@@ -244,10 +253,12 @@ class EOSKey(Signer):
             raise TypeError('Unsupported curve prefix {}'.format(curvePre))
 
         decoded_sig = self._check_decode(encoded_sig[3:], curvePre)
+        ret = self._check_encode(decoded_sig, curvePre)
         # first 2 bytes are recover param
         # recover_param = hex_to_int(decoded_sig[:2]) - 4 - 27
         # use sig
         sig = decoded_sig[2:]
+
         # verify sig by recovering the key and comparing to self._vk
         # p = self._recover_key(unhexlify(digest), unhexlify(sig), recover_param)
         # return self._vk.verify_digest(unhexlify(sig), unhexlify(digest), sigdecode=ecdsa.util.sigdecode_string)
@@ -257,3 +268,25 @@ class EOSKey(Signer):
         except ecdsa.keys.BadSignatureError:
             return False
         return True
+
+def sig_to_eossig(ecdsa_signature, ecdsa_pubkey, digest, curve=ecdsa.NIST256p):
+
+    rc = EOSKey.recovery_pubkey_param(unhexlify(ecdsa_pubkey), unhexlify(digest), unhexlify(ecdsa_signature.encode()), curve)
+    print(f"Recovery key is: {rc}")
+
+    decoded_sig = int_to_hex(rc + 4 + 27) + ecdsa_signature
+    encoded_sig = EOSKey._check_encode(None, decoded_sig, 'R1')
+    sig = b"SIG_R1_" + encoded_sig
+
+    return sig.decode()
+
+
+# TODO: test only, should be deleted soon
+class EOSKeySK(EOSKey):
+    def __init__(self, private_str=''):
+        ''' '''
+        if private_str:
+            self._key_type = 'R1'
+            self._curve = get_curve(self._key_type)
+            self._sk = ecdsa.SigningKey.from_string(unhexlify(private_str), curve=self._curve)
+        self._vk = self._sk.get_verifying_key()
