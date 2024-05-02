@@ -8,6 +8,11 @@ from .signer import Signer
 import hashlib
 import struct
 import array
+import subprocess
+
+
+CHIP_KEY_CONVERTER_JAR="/usr/share/java/ChipKeyConverter.jar"
+
 
 def get_curve(key_type) :
     if key_type == 'R1' :
@@ -23,20 +28,23 @@ def check_wif(key) :
             pass
     return False
 
-def pubkey_to_eospubkey(pub_key, curve=ecdsa.NIST256p):
-    ''' Converts pub_key to the relevant EOS public key
+def pubkey_to_eospubkey(pub_key):
+    '''Converts ecdsa pub_key to the relevant EOS public key'''
 
-        pub_key: str - string represantation of ECDSA pub key
-        curve: ecdsa.curves.Curve - ECDSA curve
-        returns: str - EOS public key
-    '''
+    cmd = f"java -jar {CHIP_KEY_CONVERTER_JAR} -m key -k {pub_key}"
+    res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, check=True)
+    pub_key = res.stdout.decode().strip()
 
-    vk = ecdsa.VerifyingKey.from_string(unhexlify(pub_key.encode()), curve=curve)
-    order = vk.curve.generator.order()
-    p = vk.pubkey.point
-    comp = EOSKey.do_compress_pubkey(order, p)
+    return pub_key
 
-    return 'EOS' + EOSKey._check_encode(None, comp).decode()
+def sig_to_eossig(ecdsa_signature, ecdsa_pubkey, data):
+    '''Converts ecdsa signature to eos signature'''
+
+    cmd = f"java -jar {CHIP_KEY_CONVERTER_JAR} -m key -k {ecdsa_pubkey} -s {ecdsa_signature} -d {data}"
+    res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, check=True)
+    eos_sig = res.stdout.decode().strip()
+
+    return eos_sig
 
 
 class EOSKey(Signer):
@@ -268,25 +276,3 @@ class EOSKey(Signer):
         except ecdsa.keys.BadSignatureError:
             return False
         return True
-
-def sig_to_eossig(ecdsa_signature, ecdsa_pubkey, digest, curve=ecdsa.NIST256p):
-
-    rc = EOSKey.recovery_pubkey_param(unhexlify(ecdsa_pubkey), unhexlify(digest), unhexlify(ecdsa_signature.encode()), curve)
-    print(f"Recovery key is: {rc}")
-
-    decoded_sig = int_to_hex(rc + 4 + 27) + ecdsa_signature
-    encoded_sig = EOSKey._check_encode(None, decoded_sig, 'R1')
-    sig = b"SIG_R1_" + encoded_sig
-
-    return sig.decode()
-
-
-# TODO: test only, should be deleted soon
-class EOSKeySK(EOSKey):
-    def __init__(self, private_str=''):
-        ''' '''
-        if private_str:
-            self._key_type = 'R1'
-            self._curve = get_curve(self._key_type)
-            self._sk = ecdsa.SigningKey.from_string(unhexlify(private_str), curve=self._curve)
-        self._vk = self._sk.get_verifying_key()

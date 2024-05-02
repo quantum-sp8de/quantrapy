@@ -76,7 +76,7 @@ class EOSRandom(EOSSP8DEBase):
         """Register account to be able generate and send randoms"""
         arguments = {
             "owner": account,
-            "pk": pubkey_to_eospubkey(public_key)
+            "pk": public_key
         }
         payload = {
             "account": self.contract_account,
