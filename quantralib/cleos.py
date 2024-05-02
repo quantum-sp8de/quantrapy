@@ -323,15 +323,8 @@ class Cleos:
             "accounts": [],
             "waits": []
         }
-        print({
-            'creator': creator,
-            'name': acct_name,
-            'owner': owner_auth,
-            'active': active_auth
-        })
 
         newaccount_data = self.abi_json_to_bin('eosio', 'newaccount', {'creator': creator, 'name': acct_name, 'owner': owner_auth, 'active': active_auth})
-        print(newaccount_data)
         newaccount_json = {
             'account': 'eosio',
             'name': 'newaccount',

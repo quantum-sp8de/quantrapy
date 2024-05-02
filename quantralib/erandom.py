@@ -72,7 +72,7 @@ class EOSRandom(EOSSP8DEBase):
 
         return ret
 
-    def register_as_generator(self, account, public_key):
+    def register_as_generator(self, account, public_key, creator_account):
         """Register account to be able generate and send randoms"""
         arguments = {
             "owner": account,
@@ -82,7 +82,7 @@ class EOSRandom(EOSSP8DEBase):
             "account": self.contract_account,
             "name": "reggenerator",
             "authorization": [{
-                "actor": account,
+                "actor": creator_account,
                 "permission": "active",
             }],
         }
