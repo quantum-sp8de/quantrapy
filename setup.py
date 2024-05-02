@@ -19,7 +19,7 @@ setup(
     long_description_content_type='text/markdown',
     author='plageat',
     author_email='plageat90@gmail.com',
-    url='https://github.com/AlexandrDedckov/quantrapy',
+    url='https://github.com/quantum-sp8de/quantrapy',
     packages=["quantralib"],
     test_suite='nose.collector',
     install_requires=[
