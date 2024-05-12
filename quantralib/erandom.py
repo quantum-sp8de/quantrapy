@@ -1,6 +1,5 @@
 from .cipher import xor_crypt_decode
 from .spade_base import EOSSP8DEBase
-from .keys import pubkey_to_eospubkey
 
 
 class EOSRandom(EOSSP8DEBase):
@@ -89,11 +88,12 @@ class EOSRandom(EOSSP8DEBase):
 
         return self._push_action_with_data(arguments, payload)
 
-    def setrandom(self, random_num, account, sign, pin):
+    def setrandom(self, random_value, random_digest, account, sign, pin):
         """Set the new value in QRandom subsystem"""
         arguments = {
             "owner": account,
-            "value": str(random_num),
+            "value": str(random_value),
+            "digest": random_digest,
             "sign": sign,
             "password": pin,
         }
