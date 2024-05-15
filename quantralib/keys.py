@@ -40,7 +40,7 @@ def pubkey_to_eospubkey(pub_key):
 def sig_to_eossig(ecdsa_signature, ecdsa_pubkey, data):
     '''Converts ecdsa signature to eos signature'''
 
-    cmd = f"java -jar {CHIP_KEY_CONVERTER_JAR} -m key -k {ecdsa_pubkey} -s {ecdsa_signature} -d {data}"
+    cmd = f"java -jar {CHIP_KEY_CONVERTER_JAR} -m sign -k {ecdsa_pubkey} -s {ecdsa_signature} -d {data}"
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, check=True)
     eos_sig = res.stdout.decode().strip()
 
