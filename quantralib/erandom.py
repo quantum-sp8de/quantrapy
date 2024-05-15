@@ -26,7 +26,7 @@ class EOSRandom(EOSSP8DEBase):
         return self.ce.get_table(self.contract_account, self.contract_account, "config")
 
     def get_config_keystable(self):
-        return self.ce.get_table(self.contract_account, self.contract_account, "confencrypt")
+        return self.ce.get_table(self.contract_account, self.contract_account, "confencrpt")
 
     def get_rkeys(self, account):
         return self.ce.get_table(self.contract_account, account, "generatorkey")
