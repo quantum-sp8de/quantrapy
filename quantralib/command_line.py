@@ -393,7 +393,7 @@ def cleos():
             priv_key = generate_dynamic_key()
 
         chain = EOSRandom(args.contract_account,
-                          p_key=priv_key,
+                          p_keys=priv_key,
                           tokens_account=args.tokens_account,
                           chain_url=args.url)
         if args.random == 'getconfig':
