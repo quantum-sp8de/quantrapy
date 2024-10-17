@@ -42,12 +42,12 @@ class EOSRandom(EOSSP8DEBase):
         return self.get_config_table_value("random_price")
 
     def _try_with_key(self, account, en_value, key_type):
-        if key_type == 'dynamic':
+        if key_type == 'encrypt':
             key = self.get_dynamic_encrypt_pubkey(account)
         elif key_type == 'backup':
             key = self.get_dynamic_backup_pubkey(account)
         else:
-            raise RuntimeError("Invilid key type, must be 'dynamic' or 'backup'")
+            raise RuntimeError("Invilid key type, must be 'encrypt' or 'backup'")
 
         value = xor_crypt_decode(en_value, key)
         return int(value)
@@ -59,7 +59,7 @@ class EOSRandom(EOSSP8DEBase):
         en_value = r['rows'][0]["value"].strip()
 
         ret = None
-        for key_type in ("dynamic", "backup"):
+        for key_type in ("encrypt", "backup"):
             try:
                 ret = self._try_with_key(owner, en_value, key_type)
                 break
@@ -67,7 +67,7 @@ class EOSRandom(EOSSP8DEBase):
                 continue
 
         if not ret:
-            raise RuntimeError("Invalid value: %s can not be restored with both dynamic/backup keys" % en_value) from None
+            raise RuntimeError("Invalid value: %s can not be restored with both encrypt/backup keys" % en_value) from None
 
         return ret
 
