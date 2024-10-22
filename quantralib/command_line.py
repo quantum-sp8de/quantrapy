@@ -156,7 +156,7 @@ def cleos():
     newacct_parser.add_argument('owner', type=str, action='store')
     newacct_parser.add_argument('--active', '-a', type=str, action='store', dest='active')
     newacct_parser.add_argument('--stake-net', type=str, action='store', default='1.0000 SPX', dest='stake_net')
-    newacct_parser.add_argument('--stake-cpu', type=str, action='store', default='1.0000 SPX', dest='stake_cpu')
+    newacct_parser.add_argument('--stake-cpu', type=str, action='store', default='3.0000 SPX', dest='stake_cpu')
     newacct_parser.add_argument('--buy-ram-kbytes', type=int, action='store', default=8, dest='ramkb')
     newacct_parser.add_argument('--permission', '-p', type=str, action='store', default='active', dest='permission')
     newacct_parser.add_argument('--transfer', action='store_true', default=False, dest='transfer')
@@ -200,10 +200,6 @@ def cleos():
     buy_random = random_subparsers.add_parser('buyrandom')
     buy_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
     buy_random.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
-    # # register generator
-    # reg_generator = random_subparsers.add_parser('reggenerator')
-    # reg_generator.add_argument('account', type=str, action='store', help='account name to buy a random value for')
-    # reg_generator.add_argument('public_key', type=str, action='store', help='public key for validate random value signature')
     # nft command
     nft_parser = subparsers.add_parser('nft')
     nft_parser.add_argument('--contract_account', '-c', type=str, action='store', help='account with NFT contract for actions', default="simpleassets")
@@ -430,8 +426,6 @@ def cleos():
             console_print(chain.get_randresult(account=args.account))
         if args.random == 'buyrandom':
             console_print(chain.buy_random(account=args.account))
-        # if args.random == 'reggenerator':
-        #     console_print(chain.register_as_generator(account=args.account, public_key=args.public_key))
     # NFT
     elif args.subparser == 'nft':
         from .spade_nft import EOSSP8DE_NFT

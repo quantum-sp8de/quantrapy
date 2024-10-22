@@ -132,8 +132,15 @@ class Cleos:
     #####
 
     def set_abi(self, account, permission, abi_file, key, broadcast=True, timeout=30):
-        current_abi = Abi(self.get_abi(account)['abi'])
-        current_sha = sha256(current_abi.get_raw().encode('utf-8'))
+        
+        current_abi = ''
+        current_sha = ''
+        
+        account_abi = self.get_abi(account)
+        if 'abi' in account_abi:
+            current_abi = Abi(account_abi['abi'])
+            current_sha = sha256(current_abi.get_raw().encode('utf-8'))
+        
         with open(abi_file) as rf:
             abi = json.load(rf)
             new_abi = Abi(abi)
@@ -163,10 +170,11 @@ class Cleos:
             return self.push_transaction(trx, sign_key, broadcast=broadcast)
 
     def set_code(self, account, permission, code_file, key, broadcast=True, timeout=30):
+        current_sha = ''
         current_code = self.get_code(account)
-        # print(current_code)
-        # print(type(current_code))
-        current_sha = current_code['code_hash']
+        if 'code_hash' in current_code:
+            current_sha = current_code['code_hash']  
+                   
         with open(code_file, 'rb') as rf:
             wasm = rf.read()
             hex_wasm = hexlify(wasm)
@@ -204,20 +212,15 @@ class Cleos:
         ''' parameter keys can be a list of WIF strings or EOSKey objects or a filename to key file'''
         chain_info, lib_info = self.get_chain_lib_info()
         trx = Transaction(transaction, chain_info, lib_info)
-        #encoded = trx.encode()
         digest = sig_digest(trx.encode(), chain_info['chain_id'])
         # sign the transaction
         signatures = []
-        # if os.path.isfile(keys):
-        #      keys = parse_key_file(keys, first_key=False)
         if not isinstance(keys, list):
             if not isinstance(keys, Signer):
                 raise EOSKeyError('Must pass a class that extends the quantralib.Signer class')
             keys = [keys]
 
         for key in keys:
-            # if check_wif(key) :
-            #     k = EOSKey(key)
             if not isinstance(key, Signer):
                 raise EOSKeyError('Must pass a class that extends the quantralib.Signer class')
             signatures.append(key.sign(digest))
@@ -291,7 +294,7 @@ class Cleos:
         return self.get('chain.abi_json_to_bin', params=None, json={"voter": voter, "proxy": proxy, "producers": producers})
 
     def create_account(self, creator, creator_privkey, acct_name, owner_key,
-                       active_key='', stake_net='1.0000 EOS', stake_cpu='1.0000 EOS', ramkb=8, permission='active',
+                       active_key='', stake_net='1.0000 SPX', stake_cpu='1.0000 SPX', ramkb=8, permission='active',
                        transfer=False, broadcast=True, timeout=30):
         ''' '''
 
@@ -365,7 +368,7 @@ class Cleos:
                [newaccount_json, buyram_json, delegate_json]
                }
         # push transaction
-        return self.push_transaction(trx, creator_privkey, broadcast=broadcast, timeout=timeout)
+        return self.push_transaction(trx, EOSKey(creator_privkey), broadcast=broadcast, timeout=timeout)
 
     def register_producer(self):
         raise NotImplementedError()
