@@ -1,11 +1,15 @@
 from .cipher import xor_crypt_decode
 from .spade_base import EOSSP8DEBase
+from .utils import MIN_CONTRACT_VERSION, EOSIncorectContractVersion
 
 
 class EOSRandom(EOSSP8DEBase):
     def __init__(self, contract_account, p_keys, tokens_account, chain_url="http://localhost", chain_port=None):
         EOSSP8DEBase.__init__(self, contract_account, p_keys, chain_url=chain_url, chain_port=chain_port)
         self.tokens_account = tokens_account
+
+        if self.get_random_contract_version() < MIN_CONTRACT_VERSION:
+            raise EOSIncorectContractVersion('Invalid contract version, please update quatrapy library to latest version')
 
     def check_if_generator(self, account):
         """Check if account is already registered to generate randoms"""
@@ -34,12 +38,15 @@ class EOSRandom(EOSSP8DEBase):
     def get_config_table_value(self, value):
         r = self.get_config_table()
         ret = r['rows'][0][value]
-
         return ret
 
     def get_random_price(self):
         """Returns the price for buying a random value"""
         return self.get_config_table_value("random_price")
+    
+    def get_random_contract_version(self):
+        table = self.ce.get_table(self.contract_account, self.contract_account, "version")
+        return table['rows'][0]['version']
 
     def _try_with_key(self, account, en_value, key_type):
         if key_type == 'encrypt':
@@ -54,20 +61,29 @@ class EOSRandom(EOSSP8DEBase):
 
     def get_randresult(self, account):
         """Get the bought decrypted random value for account"""
-        r = self.ce.get_table(self.contract_account, account, "randresult")
-        owner = r['rows'][0]["owner"]
-        en_value = r['rows'][0]["value"].strip()
+        r = self.ce.get_table(self.contract_account, account, "randresult2")
 
-        ret = None
-        for key_type in ("encrypt", "backup"):
-            try:
-                ret = self._try_with_key(owner, en_value, key_type)
-                break
-            except Exception:
+        encrypt_level = r['rows'][0]["encrypt_level"]
+        results = r['rows'][0]["results"]
+
+        ret = [] 
+        for data in results:
+            owner = data["owner"]
+            en_value = data["value"].strip()
+        
+            res = ''
+            for key_type in ("encrypt", "backup"):
+                try:
+                    res = self._try_with_key(owner, en_value, key_type)
+                    break
+                except Exception:
+                    continue
+
+            if not res:
                 continue
+                # raise RuntimeError("Invalid value: %s can not be restored with both encrypt/backup keys" % en_value) from None
 
-        if not ret:
-            raise RuntimeError("Invalid value: %s can not be restored with both encrypt/backup keys" % en_value) from None
+            ret.append(res) 
 
         return ret
 

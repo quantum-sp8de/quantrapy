@@ -47,3 +47,7 @@ class EOSSetSameCode(Exception):
 class EOSSetSameAbi(Exception):
     ''' Raised when the abi would not change on a set'''
     pass
+
+class EOSIncorectContractVersion(Exception):
+    ''' Raised when incorect contract version'''
+    pass

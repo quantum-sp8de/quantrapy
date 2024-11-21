@@ -9,7 +9,6 @@ from .utils import sig_digest, parse_key_file, sha256
 from .types import EOSEncoder, Transaction, PackedTransaction, Abi
 from .exceptions import (EOSKeyError, EOSMsigInvalidProposal, EOSSetSameAbi, EOSSetSameCode)
 import json
-import os
 from binascii import hexlify
 
 

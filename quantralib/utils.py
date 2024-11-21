@@ -1,10 +1,9 @@
 from binascii import hexlify
-import struct
 import hashlib
 import itertools
-import six
-from .exceptions import InvalidKeyFile
+from .exceptions import InvalidKeyFile, EOSIncorectContractVersion
 
+MIN_CONTRACT_VERSION = 2
 
 def parse_key_file(filename, first_key=True):
     keys = []
