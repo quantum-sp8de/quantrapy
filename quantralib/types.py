@@ -374,7 +374,7 @@ class Abi(BaseObject):
         'float64': Float(),  # NotImplemented
         # 'varuint32': VarUInt # NotImplemented
         # complex
-        'asset': Asset("1.0000 EOS"),
+        'asset': Asset("1.0000 SPX"),
         # 'checksum256': str,  # NotImplemented
         # 'block_timestamp_type': UInt64, # NotImplemented
         # 'time_point': UInt64, # NotImplemented
