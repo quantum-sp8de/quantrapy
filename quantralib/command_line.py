@@ -1,4 +1,5 @@
 import argparse
+import requests
 from .cleos import Cleos
 from .testeos import TestEos
 from .utils import parse_key_file, str2bool
@@ -420,12 +421,15 @@ def cleos():
                           p_keys=priv_key,
                           tokens_account=args.tokens_account,
                           chain_url=args.url)
-        if args.random == 'getconfig':
-            console_print(chain.get_config_table())
-        if args.random == 'getrandom':
-            console_print(chain.get_randresult(account=args.account))
-        if args.random == 'buyrandom':
-            console_print(chain.buy_random(account=args.account))
+        try:
+            if args.random == 'getconfig':
+                console_print(chain.get_config_table())
+            if args.random == 'getrandom':
+                console_print(chain.get_randresult(account=args.account))
+            if args.random == 'buyrandom':
+                console_print(chain.buy_random(account=args.account))
+        except requests.exceptions.HTTPError as ex:
+            console_print(ex.response.json())
     # NFT
     elif args.subparser == 'nft':
         from .spade_nft import EOSSP8DE_NFT
