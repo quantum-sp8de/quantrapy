@@ -200,6 +200,7 @@ def cleos():
     # random buyrandom
     buy_random = random_subparsers.add_parser('buyrandom')
     buy_random.add_argument('account', type=str, action='store', help='account name to buy a random value for')
+    buy_random.add_argument('count', type=int, action='store', help='count random values', default=1)
     buy_random.add_argument('--key-file', '-k', type=str, action='store', required=True, help='file containing the private key that will be used', dest='key_file')
     # nft command
     nft_parser = subparsers.add_parser('nft')
@@ -427,7 +428,7 @@ def cleos():
             if args.random == 'getrandom':
                 console_print(chain.get_randresult(account=args.account))
             if args.random == 'buyrandom':
-                console_print(chain.buy_random(account=args.account))
+                console_print(chain.buy_random(account=args.account, count_values=args.count))
         except requests.exceptions.HTTPError as ex:
             console_print(ex.response.json())
     # NFT

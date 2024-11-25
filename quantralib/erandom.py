@@ -198,8 +198,19 @@ class EOSRandom(EOSSP8DEBase):
 
         return self._push_action_with_data(arguments, payload)
 
-    def buy_random(self, account, memo=""):
-        """Buy a random value for the account in QRandom system and return result"""
+    def _get_actual_random_price(self, count_values): 
         rand_price = self.get_random_price()
+
+        amount, currency = rand_price.split()
+        
+        amount_float = float(amount)
+        result = amount_float * count_values
+
+        return f"{result:.4f} {currency}"
+
+
+    def buy_random(self, account, count_values, memo=""):
+        """Buy a random value for the account in QRandom system and return result"""
+        rand_price = self._get_actual_random_price(count_values)
         self.buy_random_value(account, rand_price, memo)
         return self.get_randresult(account)
