@@ -206,7 +206,7 @@ class EOSRandom(EOSSP8DEBase):
         amount_float = float(amount)
         result = amount_float * count_values
 
-        return f"{result:.4f} {currency}"
+        return f"{result:.2f} {currency}"
 
 
     def buy_random(self, account, count_values, memo=""):
